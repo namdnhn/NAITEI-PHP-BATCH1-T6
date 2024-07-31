@@ -9,6 +9,7 @@ import Cart from './components/pages/Cart.jsx';
 import Order from './components/pages/Order.jsx';
 import Detail from './components/pages/Detail.jsx';
 import Report from './components/pages/Report.jsx';
+import ProductList from './components/pages/ProductList.jsx';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/order" element={<Order />} />
         <Route path="/detail" element={<Detail />} />
         <Route path="/report" element={<Report />} />
+        <Route path="/products" element={<ProductList />} /> 
       </Routes>
       <Footer />
     </Router>
