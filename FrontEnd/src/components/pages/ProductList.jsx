@@ -29,29 +29,22 @@ function ProductList() {
 
     return (
         <div className="p-4">
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold">
-                    MEN'S - DRESS SHOES <span className="text-black">(46)</span>
-                </h1>
-                <div className="flex items-center">
-                    <div className="mr-6">
-                        Show Filters <span className="ml-2">&#8801;</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="mr-2">Sort by:</span>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="border p-2 ml-2"
-                        >
-                            <option value="">Relevance</option>
-                            <option value="price_low_to_high">Price Low to High</option>
-                            <option value="price_high_to_low">Price High to Low</option>
-                            <option value="newest_to_oldest">Newest to Oldest</option>
-                            <option value="ranking">Ranking</option>
-                        </select>
-                    </div>
-                </div>
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="border p-2"
+                />
+                <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="border p-2 ml-2"
+                >
+                    <option value="">All Categories</option>
+                    {/* Thêm các option cho category */}
+                </select>
             </div>
 
             {/* Product list */}
