@@ -1,6 +1,17 @@
 import PopupHeader from "./PopupHeader";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Header = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    navigate(`/products?search=${searchQuery}`);
+  };
+
   return (
     <header id="main-header">
       <div className="headerbar bg-white shadow">
@@ -83,8 +94,8 @@ const Header = () => {
 
             <div className="SearchForm">
               <form
-                action="/pages/ssr-search-results"
-                className="fast-simon-form flex items-center border border-gray-300 rounded overflow-hidden"
+                onSubmit={handleSearch}
+                className="items-center border-b border-black rounded-none overflow-hidden"
               >
                 <input
                   type="text"
@@ -94,26 +105,10 @@ const Header = () => {
                   aria-label="Search and use arrows or TAB to navigate results"
                   className="fast-autocomplete-input px-2 py-1 w-full"
                   autoComplete="off"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="submit" className="px-2 py-1">
-                  <svg
-                    alt="Search"
-                    aria-label="search"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#000"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="search-black"
-                  >
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                </button>
+               
               </form>
             </div>
 
