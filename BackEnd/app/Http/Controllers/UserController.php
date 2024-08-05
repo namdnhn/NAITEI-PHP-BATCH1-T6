@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -75,4 +76,18 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
     }
+
+    public function findUserByEmailAndPassword($email, $password)
+    {
+        // Fetch the user using raw SQL query
+        $user = DB::select('select * from users where email = ?', [$email]);
+
+        // Check if user exists and password matches
+        if ($user && Hash::check($password, $user[0]->password)) {
+            return response()->json($user[0]);
+        } else {
+            return response()->json(['message' => 'Invalid email or password'], 404);
+        }
+    }
+
 }

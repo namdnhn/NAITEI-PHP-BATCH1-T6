@@ -46,4 +46,14 @@ class User extends Authenticatable
             'role' => 'integer',
         ];
     }
+
+     /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 1;
+    }
 }
