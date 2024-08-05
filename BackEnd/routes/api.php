@@ -26,3 +26,4 @@ Route::apiResource('order-items', OrderItemController::class);
 Route::get('users/{email}/{password}', [UserController::class, 'findUserByEmailAndPassword']);
 
 Route::middleware('auth:sanctum')->get('/check-admin', [UserController::class, 'is_admin']);
+Route::get('cart-items', [CartItemController::class, 'get_cart_items']);

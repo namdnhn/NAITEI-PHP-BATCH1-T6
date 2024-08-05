@@ -104,4 +104,15 @@ class CartItemController extends Controller
         );
         return response()->json($cartItem, 201);
     }
+
+    public function get_cart_items()
+    {
+        $userId = 1;
+        $cartId = Cart::where('user_id', $userId)->first()->id;
+        $cartItems = CartItem::with(['productVariantSize', 'variant', 'variant.images', 'size'])
+                             ->where('cart_id', $cartId)
+                             ->get();
+
+        return response()->json($cartItems);
+    }
 }
