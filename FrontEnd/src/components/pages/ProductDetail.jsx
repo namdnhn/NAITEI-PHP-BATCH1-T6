@@ -5,6 +5,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "../sharepages/Loading";
 
 const productDataDemo = {
   name: "GADDIS NAVY SUEDE",
@@ -92,7 +93,7 @@ const ProductDetail = () => {
   }, [selectedVariant]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading/>;
   }
 
   if (!productData) {
