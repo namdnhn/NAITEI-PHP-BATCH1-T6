@@ -9,6 +9,8 @@ class ProductVariantSize extends Model
 {
     use HasFactory;
 
+    protected $table = 'product_variant_size';
+
     protected $fillable = [
         'variant_id', 'size_id', 'stock_quantity', 'price',
     ];
