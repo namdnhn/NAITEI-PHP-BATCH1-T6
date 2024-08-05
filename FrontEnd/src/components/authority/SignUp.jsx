@@ -19,7 +19,7 @@ function SignUp() {
       const response = await Axios.post('/users', userData);
 
       if (response.status === 200) {
-        window.location.href = '/login';
+        window.location.href = '/';
       } else {
         console.error('Error:', response.data);
       }

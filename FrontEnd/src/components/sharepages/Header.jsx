@@ -1,16 +1,18 @@
-import PopupHeader from "./PopupHeader";
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import PopupHeader from './PopupHeader';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const handleSearch = (event) => {
     event.preventDefault();
     navigate(`/products?search=${searchQuery}`);
   };
+
 
   return (
     <header id="main-header">
@@ -18,7 +20,7 @@ const Header = () => {
         <div className="container mx-auto flex justify-between items-center py-4">
           <div className="leftMenu flex flex-col items-left w-[30%] ml-5">
             <div className="flex flex-row items-center space-x-2">
-              <a href="/pages/rewards" className="logoSmall">
+              <Link to="/" className="logoSmall">
                 <img
                   src="//www.stevemadden.com/cdn/shop/files/LOGO_ON_WHITE_fca4eb23-117e-48ff-9180-16c8855258ef_100x.png?v=1647854305"
                   alt="Go to SM PASS"
@@ -27,38 +29,35 @@ const Header = () => {
                   loading="lazy"
                   className="opacity-100"
                 />
-              </a>
+              </Link>
 
               <div className="flex items-center space-x-2">
-                <a href="/account/login" className="text-sm">
-                  Sign In
-                </a>
-                <span className="text-sm">or</span>
-                <a href="/account/register" className="text-sm">
-                  Join Now
-                </a>
+                {user ? (
+                  <>
+                    <span className="text-sm">Hello, {user.name}</span>
+                    <button onClick={logout} className="text-sm">Sign Out</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="text-sm">Sign In</Link>
+                    <span className="text-sm">or</span>
+                    <Link to="/register" className="text-sm">Join Now</Link>
+                  </>
+                )}
               </div>
-              </div>
+            </div>
 
-              <div className="site-page-menu flex items-center space-x-2">
-                <ul className="flex items-center space-x-2">
-                  <li>
-                    <a href="/" className="text-sm">
-                      Women
-                    </a>
-                  </li>
-                  <li className="text-sm">|</li>
-                  <li>
-                    <a href="/pages/mens" className="text-sm">
-                      Men
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <div className="site-page-menu flex items-center space-x-2">
+              <ul className="flex items-center space-x-2">
+                <li><Link to="/" className="text-sm">Women</Link></li>
+                <li className="text-sm">|</li>
+                <li><Link to="/pages/mens" className="text-sm">Men</Link></li>
+              </ul>
+            </div>
           </div>
 
           <div className="logo text-center">
-            <a href="/" className="site-logo-new">
+            <Link to="/" className="site-logo-new">
               <div className="normal-logo">
                 <img
                   className="max-h-11"
@@ -66,12 +65,12 @@ const Header = () => {
                   alt="Steve Madden Logo"
                 />
               </div>
-            </a>
+            </Link>
           </div>
 
           <div className="rightMenu flex justify-end text-right mr-5 space-x-4 w-[30%]">
             <div className="wishlist_main_header">
-              <a href="/pages/wishlist" className="swym-wishlist">
+              <Link to="/pages/wishlist" className="swym-wishlist">
                 <svg
                   alt="Wishlist"
                   aria-labelledby="wishlist-icon"
@@ -89,7 +88,7 @@ const Header = () => {
                   <title id="wishlist-icon">Wishlist</title>
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
-              </a>
+              </Link>
             </div>
 
             <div className="SearchForm">
@@ -108,15 +107,31 @@ const Header = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-               
+                <button type="submit" className="px-2 py-1">
+                  <svg
+                    alt="Search"
+                    aria-label="search"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="search-black"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
               </form>
             </div>
 
             <div className="cartTop cartOuter relative">
-              <a href="/cart" className="relative">
-                <span className="cartCount absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                  0
-                </span>
+              <Link to="/cart" className="relative">
+                <span className="cartCount absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">0</span>
                 <svg
                   alt="Cart"
                   aria-label="cart"
@@ -133,7 +148,7 @@ const Header = () => {
                     fill="black"
                   ></path>
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
