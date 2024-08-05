@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
+use App\Models\Cart;
+use App\Models\ProductVariantSize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CartItemController extends Controller
 {
@@ -66,5 +70,38 @@ class CartItemController extends Controller
         } else {
             return response()->json(['message' => 'Cart item not found'], 404);
         }
+    }
+
+    public function add_item_to_cart(Request $request)
+    {
+        $validatedData = $request->validate([
+            'product_variant_id' => 'required',
+            'size_id' => 'required',
+            'quantity' => 'required|integer|min:1',
+        ]);
+        $userId = 1;
+        $cartId = 1;
+
+        $productVariantSize = ProductVariantSize::where('variant_id', $validatedData['product_variant_id'])->where('size_id', $validatedData['size_id'])->first();
+        $productVariantSizeId = $productVariantSize->id;
+
+        if(Cart::where('id', $cartId)->count() == 0){
+            Cart::create(['user_id' => $userId]);
+        }
+
+        if(CartItem::where('cart_id', $cartId)->where('product_variant_size_id', $productVariantSizeId)->count() > 0){
+            $cartItem = CartItem::where('cart_id', $cartId)->where('product_variant_size_id', $productVariantSizeId)->first();
+            $cartItem->update(['quantity' => $cartItem->quantity + $validatedData['quantity']]);
+            return response()->json($cartItem, 202);
+        }
+
+        $cartItem = CartItem::create(
+            [
+                'cart_id' => $cartId,
+                'product_variant_size_id' => $productVariantSizeId,
+                'quantity' => $validatedData['quantity'],
+            ]
+        );
+        return response()->json($cartItem, 201);
     }
 }
