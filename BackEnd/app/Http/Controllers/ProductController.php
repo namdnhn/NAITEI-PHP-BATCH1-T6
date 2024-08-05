@@ -8,11 +8,44 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // Get all products
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $sort = $request->query('sort', '');
+        $search = $request->query('search', '');
+        $products = Product::query();
+
+        if ($search) {
+            $products->where('name', 'like', "%$search%");
+        }
+        switch ($sort) {
+            case 'price_low_to_high':
+                $products->orderBy('price', 'asc');
+                break;
+            case 'price_high_to_low':
+                $products->orderBy('price', 'desc');
+                break;
+            case 'newest_to_oldest':
+                $products->orderBy('created_at', 'desc');
+                break;
+            case 'ranking':
+                // có một cột `ranking` trong bảng products
+                $products->orderBy('ranking', 'desc');
+                break;
+            default:
+                $products->orderBy('created_at', 'asc');
+                break;
+        }
+
+        $products = $products->get();
+
+        // Thêm URL đầy đủ cho hình ảnh
+        foreach ($products as $product) {
+            $product->image_url = asset($product->image);
+        }
+
         return response()->json($products);
     }
+
 
     // Get a single product
     public function show($id)
@@ -55,4 +88,6 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
     }
+
+
 }
