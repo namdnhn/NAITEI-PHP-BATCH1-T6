@@ -13,6 +13,7 @@ import ProductList from './components/pages/ProductList.jsx';
 import ProductDetail from './components/pages/ProductDetail.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 
+import Profile from './components/pages/Profile.jsx';
 function App() {
   return (
     <Router>
@@ -29,6 +30,7 @@ function App() {
           <Route path="/products" element={<ProductList />} /> 
           <Route path="/register" element={<SignUp />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/profile/*" element={<Profile />} />
         </Routes>
         <Footer />
       </AuthProvider>
