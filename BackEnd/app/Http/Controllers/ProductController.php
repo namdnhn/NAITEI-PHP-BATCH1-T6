@@ -89,5 +89,13 @@ class ProductController extends Controller
         }
     }
 
+    // List products for admin
+    public function list(Request $request)
+    {
+        $limit = $request->query('limit', 10);
+        $products = Product::with('variants', 'variants.sizes')->paginate($limit);
+        return response()->json($products);
+    }
+
 
 }
