@@ -89,5 +89,18 @@ class ProductController extends Controller
         }
     }
 
+    public function get_detail_info_product($id)
+    {
+        $product = Product::find($id)->with('variants', 'variants.sizes', 'variants.images')->first();
+        if ($product) {
+            if (!$product->image) {
+                $product->image = $product->variants[0]->images[0]->url;
+            }
+            return response()->json($product);
+        } else {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+    }
+
 
 }
