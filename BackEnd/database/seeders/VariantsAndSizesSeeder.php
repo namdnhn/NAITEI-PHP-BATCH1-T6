@@ -39,9 +39,9 @@ class VariantsAndSizesSeeder extends Seeder
         $variant_white_id = Variant::where('name', 'White')->first()->id;
 
         $sizes = [
-            ['name' => '7', 'description' => ''],
-            ['name' => '8', 'description' => ''],
-            ['name' => '9', 'description' => '']
+            ['name' => '7'],
+            ['name' => '8'],
+            ['name' => '9']
         ];
 
         Size::insert($sizes);
