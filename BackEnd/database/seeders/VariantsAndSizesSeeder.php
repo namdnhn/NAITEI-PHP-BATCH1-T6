@@ -10,6 +10,7 @@ use App\Models\Size;
 use App\Models\ProductVariantSize;
 use App\Models\Image;
 use App\Models\ImagesVariant;
+use App\Models\Category;
 
 class VariantsAndSizesSeeder extends Seeder
 {
@@ -18,6 +19,12 @@ class VariantsAndSizesSeeder extends Seeder
      */
     public function run(): void
     {
+        if (!Category::where('id', '1')->exists()) {
+            Category::create([
+                'name' => 'Shoes',
+            ]);
+        }
+        
         Product::create([
             'name' => 'JAYSHAN LEATHER',
             'description' => 'Elevate your formal wardrobe with the JAYSHAN dress loafer. The soft tumbled leather and slip-on construction provide comfort, while the metal bit embellishment and almond toe add a touch of sophistication. Make a statement on any occasion with this stylish and versatile piece.',
@@ -39,9 +46,9 @@ class VariantsAndSizesSeeder extends Seeder
         $variant_white_id = Variant::where('name', 'White')->first()->id;
 
         $sizes = [
-            ['name' => '7', 'description' => ''],
-            ['name' => '8', 'description' => ''],
-            ['name' => '9', 'description' => '']
+            ['name' => '7'],
+            ['name' => '8'],
+            ['name' => '9']
         ];
 
         Size::insert($sizes);
