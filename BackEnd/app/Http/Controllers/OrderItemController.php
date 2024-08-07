@@ -7,66 +7,51 @@ use Illuminate\Http\Request;
 
 class OrderItemController extends Controller
 {
-    // Get all order items
     public function index()
     {
-        $orderItems = OrderItem::with('order', 'productVariantSize')->get();
-        return response()->json($orderItems);
+        return OrderItem::all();
     }
 
-    // Get a single order item
     public function show($id)
     {
-        $orderItem = OrderItem::with('order', 'productVariantSize')->find($id);
-        if ($orderItem) {
-            return response()->json($orderItem);
-        } else {
-            return response()->json(['message' => 'Order item not found'], 404);
-        }
+        return OrderItem::findOrFail($id);
     }
 
-    // Create a new order item
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'product_variant_size_id' => 'required|exists:product_variant_sizes,id',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+        $request->validate([
+            'order_id' => 'required|integer',
+            'product_variant_size_id' => 'required|integer',
+            'quantity' => 'required|integer',
+            'price' => 'required|numeric',
         ]);
 
-        $orderItem = OrderItem::create($validatedData);
+        $orderItem = OrderItem::create($request->all());
+
         return response()->json($orderItem, 201);
     }
 
-    // Update an existing order item
     public function update(Request $request, $id)
     {
-        $orderItem = OrderItem::find($id);
-        if ($orderItem) {
-            $validatedData = $request->validate([
-                'order_id' => 'sometimes|required|exists:orders,id',
-                'product_variant_size_id' => 'sometimes|required|exists:product_variant_sizes,id',
-                'quantity' => 'sometimes|required|integer|min:1',
-                'price' => 'sometimes|required|numeric|min:0',
-            ]);
+        $orderItem = OrderItem::findOrFail($id);
 
-            $orderItem->update($validatedData);
-            return response()->json($orderItem);
-        } else {
-            return response()->json(['message' => 'Order item not found'], 404);
-        }
+        $request->validate([
+            'order_id' => 'integer',
+            'product_variant_size_id' => 'integer',
+            'quantity' => 'integer',
+            'price' => 'numeric',
+        ]);
+
+        $orderItem->update($request->all());
+
+        return response()->json($orderItem, 200);
     }
 
-    // Delete an order item
     public function destroy($id)
     {
-        $orderItem = OrderItem::find($id);
-        if ($orderItem) {
-            $orderItem->delete();
-            return response()->json(['message' => 'Order item deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Order item not found'], 404);
-        }
+        $orderItem = OrderItem::findOrFail($id);
+        $orderItem->delete();
+
+        return response()->json(null, 204);
     }
 }
