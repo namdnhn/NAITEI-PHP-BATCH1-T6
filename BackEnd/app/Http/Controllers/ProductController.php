@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImagesVariant;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\Size;
 use App\Models\ProductVariantSize;
 use App\Models\Image;
+use App\Http\Controllers\VariantController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -147,9 +150,13 @@ class ProductController extends Controller
                 if ($request->hasFile("variants.$variantIndex.images")) {
                     foreach ($request->file("variants.$variantIndex.images") as $image) {
                         $path = $image->store('images', 'public');
-                        Image::create([
+                        $img = Image::create([
                             'variant_id' => $variant->id,
                             'url' => $path,
+                        ]);
+                        ImagesVariant::create([
+                            'variant_id' => $variant->id,
+                            'image_id' => $img->id,
                         ]);
                     }
                 }
@@ -157,10 +164,118 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json($product->load('variants.sizes', 'variants.images'), 201);
+            $response = $product->load('variants.sizes', 'variants.images');
+            foreach ($response->variants as $variant) {
+                foreach ($variant->images as $image) {
+                    $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                }
+            }
+
+            return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Failed to create product', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'variants' => 'required|array',
+            'variants.*.id' => 'nullable|exists:variants,id',
+            'variants.*.name' => 'required|string',
+            'variants.*.sizes' => 'required|array',
+            'variants.*.sizes.*.id' => 'nullable|exists:sizes,id',
+            'variants.*.sizes.*.name' => 'required|string',
+            'variants.*.sizes.*.stock_quantity' => 'required|integer',
+            'variants.*.sizes.*.price' => 'required|numeric',
+            'variants.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $product = Product::findOrFail($id);
+            $product->update([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'price' => $request->input('price'),
+                'category_id' => $request->input('category_id'),
+            ]);
+
+            $existingVariantIds = $product->variants->pluck('id')->toArray();
+            $newVariantIds = [];
+
+            foreach ($request->input('variants') as $variantIndex => $variantData) {
+                $variant = Variant::updateOrCreate(
+                    ['id' => $variantData['id'] ?? null, 'product_id' => $product->id],
+                    ['name' => $variantData['name']]
+                );
+                $newVariantIds[] = $variant->id;
+
+                $existingSizeIds = $variant->sizes->pluck('id')->toArray();
+                $newSizeIds = [];
+
+                foreach ($variantData['sizes'] as $sizeData) {
+                    $size = Size::firstOrCreate(['name' => $sizeData['name']]);
+                    ProductVariantSize::updateOrCreate(
+                        ['variant_id' => $variant->id, 'size_id' => $size->id],
+                        ['stock_quantity' => $sizeData['stock_quantity'], 'price' => $sizeData['price']]
+                    );
+                    $newSizeIds[] = $size->id;
+                }
+
+                foreach (array_diff($existingSizeIds, $newSizeIds) as $sizeId) {
+                    ProductVariantSize::where('variant_id', $variant->id)->where('size_id', $sizeId)->delete();
+                }
+
+                // Handle images
+                $existingImageIds = $variant->images->pluck('id')->toArray();
+                $newImageIds = $variantData['images'] ?? [];
+
+                // Delete images that are no longer in the request
+                foreach ($existingImageIds as $existingImageId) {
+                    if (!in_array($existingImageId, $newImageIds)) {
+                        $image = Image::find($existingImageId);
+                        Storage::disk('public')->delete($image->url);
+                        $image->delete();
+                    }
+                }
+
+                // Add new images
+                if ($request->hasFile("variants.$variantIndex.images")) {
+                    foreach ($request->file("variants.$variantIndex.images") as $image) {
+                        $path = $image->store('images', 'public');
+                        Image::create([
+                            'variant_id' => $variant->id,
+                            'url' => $path,
+                        ]);
+                    }
+                }
+
+            }
+
+            foreach (array_diff($existingVariantIds, $newVariantIds) as $variantId) {
+                $variantController = new VariantController();
+                $variantController->delete(Variant::find($variantId));
+            }
+
+            DB::commit();
+
+            $response = $product->load('variants.sizes', 'variants.images');
+            foreach ($response->variants as $variant) {
+                foreach ($variant->images as $image) {
+                    $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                }
+            }
+            return response()->json($response, 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update product', 'details' => $e->getMessage()], 500);
         }
     }
 }
