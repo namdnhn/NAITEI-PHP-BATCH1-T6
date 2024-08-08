@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Variant;
+use App\Models\Size;
+use App\Models\ProductVariantSize;
+use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -97,5 +102,65 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function create_new_product(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'variants' => 'required|array',
+            'variants.*.name' => 'required|string',
+            'variants.*.sizes' => 'required|array',
+            'variants.*.sizes.*.name' => 'required|string',
+            'variants.*.sizes.*.stock_quantity' => 'required|integer',
+            'variants.*.sizes.*.price' => 'required|numeric',
+            'variants.*.images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
+        DB::beginTransaction();
+
+        try {
+            $product = Product::create([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'price' => $request->input('price'),
+                'category_id' => $request->input('category_id'),
+            ]);
+
+            foreach ($request->input('variants') as $variantIndex => $variantData) {
+                $variant = Variant::create([
+                    'product_id' => $product->id,
+                    'name' => $variantData['name'],
+                ]);
+
+                foreach ($variantData['sizes'] as $sizeData) {
+                    $size = Size::firstOrCreate(['name' => $sizeData['name']]);
+                    ProductVariantSize::create([
+                        'variant_id' => $variant->id,
+                        'size_id' => $size->id,
+                        'stock_quantity' => $sizeData['stock_quantity'],
+                        'price' => $sizeData['price'],
+                    ]);
+                }
+
+                if ($request->hasFile("variants.$variantIndex.images")) {
+                    foreach ($request->file("variants.$variantIndex.images") as $image) {
+                        $path = $image->store('images', 'public');
+                        Image::create([
+                            'variant_id' => $variant->id,
+                            'url' => $path,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json($product->load('variants.sizes', 'variants.images'), 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to create product', 'details' => $e->getMessage()], 500);
+        }
+    }
 }
