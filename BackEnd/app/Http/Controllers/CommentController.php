@@ -7,17 +7,23 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    // Get all comments
-    public function index()
+    // Get all comments for a specific product
+    public function index($productId)
     {
-        $comments = Comment::all();
+        // Lấy tất cả các bình luận cho sản phẩm cụ thể và kèm theo thông tin người dùng
+        $comments = Comment::where('product_id', $productId)
+                            ->with('user:id,name') // Chỉ lấy tên và id của người dùng
+                            ->get();
+
         return response()->json($comments);
     }
 
     // Get a single comment
     public function show($id)
     {
-        $comment = Comment::find($id);
+        // Lấy bình luận và thông tin người dùng
+        $comment = Comment::with('user:id,name')->find($id);
+        
         if ($comment) {
             return response()->json($comment);
         } else {
@@ -26,16 +32,20 @@ class CommentController extends Controller
     }
 
     // Create a new comment
-    public function store(Request $request)
+    public function store(Request $request, $productId)
     {
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'product_id' => 'required|exists:products,id',
             'comment' => 'required|string',
         ]);
 
+        $validatedData['product_id'] = $productId;
+
+        // Tạo bình luận mới
         $comment = Comment::create($validatedData);
-        return response()->json($comment, 201);
+
+        // Trả về bình luận với thông tin người dùng
+        return response()->json($comment->load('user:id,name'), 201);
     }
 
     // Update an existing comment
@@ -45,12 +55,11 @@ class CommentController extends Controller
         if ($comment) {
             $validatedData = $request->validate([
                 'user_id' => 'sometimes|required|exists:users,id',
-                'product_id' => 'sometimes|required|exists:products,id',
                 'comment' => 'sometimes|required|string',
             ]);
 
             $comment->update($validatedData);
-            return response()->json($comment);
+            return response()->json($comment->load('user:id,name'));
         } else {
             return response()->json(['message' => 'Comment not found'], 404);
         }

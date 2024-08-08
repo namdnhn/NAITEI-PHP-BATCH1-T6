@@ -4,6 +4,7 @@ import Axios from "../../constants/Axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "../sharepages/Loading";
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -11,6 +12,9 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,6 +30,10 @@ const ProductDetail = () => {
           }
         }
 
+        // Fetch comments for the product
+        const commentsResponse = await Axios.get(`/products/${id}/comments`);
+        setComments(commentsResponse.data);
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -35,6 +43,35 @@ const ProductDetail = () => {
 
     fetchProduct();
   }, [id]);
+
+  const handleCommentSubmit = async () => {
+    if (!user) {
+      toast.error("You must be logged in to comment");
+      return;
+    }
+    if (!comment.trim()) {
+      toast.error("Comment cannot be empty");
+      return;
+    }
+
+    try {
+      const response = await Axios.post(`/products/${id}/comments`, {
+        user_id: user.id,
+        comment: comment,
+      });
+      setComments([...comments, response.data]);
+      setComment('');
+      toast.success("Comment added successfully");
+    } catch (error) {
+      toast.error("Error adding comment");
+    }
+  };
+
+  const handleFacebookShare = () => {
+    const url = window.location.href; // URL hiện tại của trang sản phẩm
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookShareUrl, '_blank');
+  };
 
   if (loading) {
     return <Loading />;
@@ -129,6 +166,49 @@ const ProductDetail = () => {
           >
             ADD TO CART
           </button>
+        </div>
+
+        {/* Facebook Share Button */}
+        <div className="text-center mt-4">
+          <button
+            className="bg-blue-600 text-white py-2 px-4 font-bold"
+            onClick={handleFacebookShare}
+          >
+            Share on Facebook
+          </button>
+        </div>
+
+        {/* Comment Section */}
+        <div className="mt-8">
+          <h3 className="text-lg font-bold">Leave a Comment</h3>
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded-md"
+            rows="4"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Write your comment here..."
+          />
+          <button
+            className="bg-black text-white py-2 px-4 mt-2 font-bold w-full"
+            onClick={handleCommentSubmit}
+          >
+            Submit Comment
+          </button>
+        </div>
+
+        {/* Display Comments */}
+        <div className="mt-8">
+          <h3 className="text-lg font-bold">Comments</h3>
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <div key={comment.id} className="border-t pt-2 mt-2">
+                <strong>{comment.user.name}</strong>
+                <p>{comment.comment}</p>
+              </div>
+            ))
+          ) : (
+            <p>No comments yet</p>
+          )}
         </div>
       </div>
     </div>
