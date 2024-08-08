@@ -59,7 +59,6 @@ const CreateProduct = () => {
         },
       });
       setMessage("Product created successfully!");
-      console.log("Product created successfully:", response.data);
     } catch (error) {
       setMessage("Failed to create product.");
       console.error("Failed to create product:", error);

@@ -24,7 +24,6 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await Axios.get(`/products/${id}/variants`);
-        console.log(response.data);
         const product = response.data;
         setProductData(product);
 

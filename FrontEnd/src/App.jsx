@@ -13,6 +13,7 @@ import ProductList from './components/pages/ProductList.jsx';
 import ProductDetail from './components/pages/ProductDetail.jsx';
 import CreateNewProduct from './components/pages/admin/CreateNewProduct.jsx';
 import ShowListProduct from './components/pages/admin/ShowListProduct.jsx';
+import UpdateProduct from './components/pages/admin/UpdateProduct.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import Profile from './components/pages/Profile.jsx';
 import AdminRoute from './contexts/AdminRoute'; // Import từ cùng thư mục với AuthContext
@@ -37,8 +38,9 @@ function App() {
 
           {/* Bảo vệ các trang quản trị */}
           <Route path="/admin">
-            <Route path="create-new-product" element={<AdminRoute><CreateNewProduct /></AdminRoute>} />
+            <Route path="create-new-product" element={<CreateNewProduct />} />
             <Route path="show-list-product" element={<AdminRoute><ShowListProduct /></AdminRoute>} />
+            <Route path="edit-product/:productId" element={<UpdateProduct />} />
           </Route>
         </Routes>
         <Footer />

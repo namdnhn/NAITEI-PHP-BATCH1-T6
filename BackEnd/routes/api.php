@@ -48,6 +48,9 @@ Route::post('create-new-product', [ProductController::class, 'create_new_product
 Route::get('users/{email}/{password}', [UserController::class, 'findUserByEmailAndPassword']);
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
-    Route::post('create-new-product', [ProductController::class, 'create_new_product']);
     Route::get('show-list-product', [ProductController::class, 'list']);
 });
+Route::get('get-product/{id}', [ProductController::class, 'get_product_information']);
+
+Route::post('create-new-product', [ProductController::class, 'create_new_product']);
+Route::post('update-product/{id}', [ProductController::class, 'update_product']);
