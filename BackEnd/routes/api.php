@@ -33,3 +33,4 @@ Route::middleware('auth:sanctum')->get('/check-admin', [UserController::class, '
 Route::get('cart-items', [CartItemController::class, 'get_cart_items']);
 
 Route::get('get-list-products', [ProductController::class, 'list']);
+Route::post('create-new-product', [ProductController::class, 'create_new_product']);
