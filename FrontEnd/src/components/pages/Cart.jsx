@@ -158,9 +158,11 @@ const Cart = () => {
       <div className="flex justify-end">
         <div className="w-full lg:w-1/3 border rounded-lg p-4">
           <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
-          <button className="w-full bg-black text-white py-2 mt-4 font-bold">
-            CHECKOUT
-          </button>
+          <Link to="/order">
+            <button className="w-full bg-black text-white py-2 mt-4 font-bold">
+              CHECKOUT
+            </button>
+          </Link>
         </div>
       </div>
       <ToastContainer />
