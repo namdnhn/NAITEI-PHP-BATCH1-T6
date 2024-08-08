@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CommentController;
@@ -18,6 +20,8 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('products', ProductController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('comments', CommentController::class);
+Route::apiResource('categories', CategoryController::class);
+Route::get('categories/{categoryId}/products', [CategoryController::class, 'get_products_by_category']);
 Route::get('products/{productId}/variants', [VariantController::class, 'index']);
 Route::post('add-to-cart', [CartItemController::class, 'add_item_to_cart']);
 Route::apiResource('orders', OrderController::class);
