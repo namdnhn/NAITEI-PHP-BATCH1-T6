@@ -13,16 +13,21 @@ class UpdateProductImagesSeeder extends Seeder
     {
         // Danh sách hình ảnh
         $images = [
-            'images/STEVEMADDEN_MENS_AALON_BLACK-LEATHER_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_AALON_TAN-LEATHER-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_DAYMIN_BLACK-PATENT_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_DAYMIN_BROWN-LEATHER_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_DAYMIN_TAN-LEATHER_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_FREDERICK_TAN-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_JAYSHAN_BLACK-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_MENS_NATAN_BLACK-WHITE-MULTI_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_SHOES_ZEV_BLACK-BOX_01-ezgif.com-webp-to-png-converter.png',
-            'images/STEVEMADDEN_SHOES_ZEV_BURGANDY_01-ezgif.com-webp-to-png-converter.png',
+            'images/STEVEMADDEN_MENS_AALON_TAN-LEATHER.png',
+            'images/STEVEMADDEN_MENS_CAYCE_BLACK-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_DAYMIN_BLACK-PATENT_01.png',
+            'images/STEVEMADDEN_MENS_DAYMIN_BROWN-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_DAYMIN_TAN-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_HADAR_SILVER_01.png',
+            'images/STEVEMADDEN_MENS_JAMONE_TAN_01.png',
+            'images/STEVEMADDEN_MENS_JARRIS_BLACK-LEATHER.png',
+            'images/STEVEMADDEN_MENS_JAYSHAN_BLACK_grande.png',
+            'images/STEVEMADDEN_MENS_JAYSHAN_WHITE-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_KOLEMAN_BLACK-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_KOLEMAN_TAN-LEATHER_01.png',
+            'images/STEVEMADDEN_MENS_NATAN_BROWN-MULTI_01.png',
+            'images/STEVEMADDEN_MENS_ONDRE_SAND.png',
+            'images/STEVEMADDEN_MENS_ONDRE_TAN.png',
         ];
 
         $shoes = Product::all();
