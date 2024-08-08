@@ -4,8 +4,16 @@ import AccountDashboard from './AccountDashboard';
 import MyOrders from './MyOrders';
 import MyAddressBook from './MyAddressBook';
 import EditProfile from './EditProfile';
+import { useAuth } from '../../contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 const Profile = () => {
+    const { user } = useAuth();
+    
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
+
     return (
         <div className="flex">
             <div className="w-1/4 mt-4 ml-8 p-4 bg-white">
