@@ -11,6 +11,7 @@ import Detail from './components/pages/Detail.jsx';
 import Report from './components/pages/Report.jsx';
 import ProductList from './components/pages/ProductList.jsx';
 import ProductDetail from './components/pages/ProductDetail.jsx';
+import CreateNewProduct from './components/pages/admin/CreateNewProduct.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 
 import Profile from './components/pages/Profile.jsx';
@@ -31,6 +32,9 @@ function App() {
           <Route path="/register" element={<SignUp />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/profile/*" element={<Profile />} />
+          <Route path="/admin">
+            <Route path="create-new-product" element={<CreateNewProduct />} />
+          </Route>
         </Routes>
         <Footer />
       </AuthProvider>
