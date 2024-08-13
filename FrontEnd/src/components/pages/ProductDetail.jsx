@@ -5,6 +5,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "../sharepages/Loading";
 
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 const ProductDetail = () => {
   const { id } = useParams();
   const [productData, setProductData] = useState(null);
@@ -16,6 +20,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await Axios.get(`/products/${id}/variants`);
+        console.log(response.data);
         const product = response.data;
         setProductData(product);
 
@@ -68,21 +73,31 @@ const ProductDetail = () => {
     }
   };
 
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
   return (
     <div className="product-detail p-4 mx-auto max-w-screen-lg flex">
       {/* Left Side: Image and Toast */}
-      <div className="w-2/3 pr-4">
-        <div className="mb-4">
-          {selectedVariant && selectedVariant.images && selectedVariant.images.length > 0 ? (
-            <img
-              src={selectedVariant.images[0].url}
-              alt={productData.name}
-              className="w-full"
-            />
-          ) : (
-            <div>No image available</div>
-          )}
-        </div>
+      <div className="w-2/3">
+        {selectedVariant && selectedVariant.images.length > 0 && (
+          <Slider {...settings}>
+            {selectedVariant.images.map((image, index) => (
+              <div key={index} className="p-2">
+                <img
+                  src={image.url}
+                  alt={`Product Image ${index + 1}`}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </Slider>
+        )}
         <ToastContainer />
       </div>
 

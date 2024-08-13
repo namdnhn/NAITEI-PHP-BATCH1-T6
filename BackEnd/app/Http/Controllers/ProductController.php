@@ -9,6 +9,7 @@ use App\Models\ProductVariantSize;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -128,6 +129,8 @@ class ProductController extends Controller
                 'category_id' => $request->input('category_id'),
             ]);
 
+            $firstImagePath = null;
+
             foreach ($request->input('variants') as $variantIndex => $variantData) {
                 $variant = Variant::create([
                     'product_id' => $product->id,
@@ -147,12 +150,27 @@ class ProductController extends Controller
                 if ($request->hasFile("variants.$variantIndex.images")) {
                     foreach ($request->file("variants.$variantIndex.images") as $image) {
                         $path = $image->store('images', 'public');
-                        Image::create([
+                        $storagePath = Storage::url($path);
+
+                        $imageModel = Image::create([
                             'variant_id' => $variant->id,
-                            'url' => $path,
+                            'url' => Storage::url($path),
                         ]);
+
+                        // Liên kết hình ảnh với biến thể
+                        $variant->images()->attach($imageModel->id);
+
+
+                        if ($firstImagePath === null) {
+                            $firstImagePath = $storagePath; // Lưu đường dẫn của hình ảnh đầu tiên
+                        }
                     }
                 }
+            }
+
+            if ($firstImagePath) {
+                $product->image = $firstImagePath;
+                $product->save();
             }
 
             DB::commit();
@@ -163,4 +181,5 @@ class ProductController extends Controller
             return response()->json(['error' => 'Failed to create product', 'details' => $e->getMessage()], 500);
         }
     }
+
 }
