@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImagesVariant;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\Size;
@@ -103,6 +104,27 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function get_product_information($id)
+    {
+        try {
+            $product = Product::with([
+                'variants.sizes',
+                'variants.images'
+            ])->findOrFail($id);
+
+            // Tạo đường dẫn đầy đủ cho URL hình ảnh
+            foreach ($product->variants as $variant) {
+                foreach ($variant->images as $image) {
+                    $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                }
+            }
+
+            return response()->json($product, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Product not found', 'details' => $e->getMessage()], 404);
+        }
+    }
+
     public function create_new_product(Request $request)
     {
         $request->validate([
@@ -175,11 +197,147 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json($product->load('variants.sizes', 'variants.images'), 201);
+            $response = $product->load('variants.sizes', 'variants.images');
+            foreach ($response->variants as $variant) {
+                foreach ($variant->images as $image) {
+                    $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                }
+            }
+
+            return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Failed to create product', 'details' => $e->getMessage()], 500);
         }
+    }
+
+    public function update_product(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'variants' => 'required|array',
+            'variants.*.id' => 'nullable|exists:variants,id',
+            'variants.*.name' => 'required|string',
+            'variants.*.sizes' => 'required|array',
+            'variants.*.sizes.*.id' => 'nullable|exists:sizes,id',
+            'variants.*.sizes.*.name' => 'required|string',
+            'variants.*.sizes.*.stock_quantity' => 'required|integer',
+            'variants.*.sizes.*.price' => 'required|numeric',
+            'variants.*.delete_images_id' => 'nullable|array',
+            'variants.*.new_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $product = $this->updateProductDetails($request, $id);
+            $this->handleVariants($request, $product);
+
+            DB::commit();
+
+            return response()->json($this->formatProductResponse($product), 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update product', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    private function updateProductDetails($request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'price' => $request->input('price'),
+            'category_id' => $request->input('category_id'),
+        ]);
+        return $product;
+    }
+
+    private function handleVariants($request, $product)
+    {
+        $existingVariantIds = $product->variants->pluck('id')->toArray();
+        logger($existingVariantIds);
+        $newVariantIds = [];
+
+        foreach ($request->input('variants') as $variantIndex => $variantData) {
+            $variant = Variant::updateOrCreate(
+                ['id' => $variantData['id'] ?? null, 'product_id' => $product->id],
+                ['name' => $variantData['name']]
+            );
+            $newVariantIds[] = $variant->id;
+
+            $this->handleSizes($variantData, $variant);
+            $this->handleImages($request, $variant, $variantIndex, $variantData);
+        }
+
+        $this->deleteOldVariants($existingVariantIds, $newVariantIds);
+    }
+
+    private function handleSizes($variantData, $variant)
+    {
+        $existingSizeIds = $variant->sizes->pluck('id')->toArray();
+        $newSizeIds = [];
+
+        foreach ($variantData['sizes'] as $sizeData) {
+            $size = Size::firstOrCreate(['name' => $sizeData['name']]);
+            ProductVariantSize::updateOrCreate(
+                ['variant_id' => $variant->id, 'size_id' => $size->id],
+                ['stock_quantity' => $sizeData['stock_quantity'], 'price' => $sizeData['price']]
+            );
+            $newSizeIds[] = $size->id;
+        }
+
+        foreach (array_diff($existingSizeIds, $newSizeIds) as $sizeId) {
+            ProductVariantSize::where('variant_id', $variant->id)->where('size_id', $sizeId)->delete();
+        }
+    }
+
+    private function handleImages($request, $variant, $variantIndex, $variantData)
+    {
+        if (isset($variantData['delete_images_id'])) {
+            ImagesVariant::whereIn('image_id', $variantData['delete_images_id'])->delete();
+            Image::whereIn('id', $variantData['delete_images_id'])->delete();
+        }
+
+        if ($request->hasFile("variants.$variantIndex.new_images")) {
+            foreach ($request->file("variants.$variantIndex.new_images") as $image) {
+                $path = $image->store('images', 'public');
+                $img = Image::create([
+                    'variant_id' => $variant->id,
+                    'url' => $path,
+                ]);
+                ImagesVariant::create([
+                    'variant_id' => $variant->id,
+                    'image_id' => $img->id,
+                ]);
+            }
+        }
+    }
+
+    private function deleteOldVariants($existingVariantIds, $newVariantIds)
+    {
+        foreach (array_diff($existingVariantIds, $newVariantIds) as $variantId) {
+            ProductVariantSize::where('variant_id', $variantId)->delete();
+            $image_id = ImagesVariant::where('variant_id', $variantId)->pluck('image_id')->toArray();
+            ImagesVariant::where('variant_id', $variantId)->delete();
+            Image::whereIn('id', $image_id)->delete();
+            Variant::find($variantId)->delete();
+        }
+    }
+
+    private function formatProductResponse($product)
+    {
+        $response = $product->load('variants.sizes', 'variants.images');
+        foreach ($response->variants as $variant) {
+            foreach ($variant->images as $image) {
+                $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+            }
+        }
+        return $response;
     }
 
 }

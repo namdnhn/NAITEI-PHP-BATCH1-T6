@@ -73,9 +73,7 @@ const Order = () => {
         price: item.product_variant_size.price,
       }));
 
-      console.log(orderData)
       for (const orderItem of orderItemsData) {
-        console.log(orderItem)
         await Axios.post("/order-items", orderItem);
       }
 
