@@ -18,6 +18,11 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// Route để cập nhật email
+Route::put('/user/update-email', [UserController::class, 'updateEmail'])->middleware('auth:sanctum');
+
+// Route để cập nhật mật khẩu
+Route::put('/user/update-password', [UserController::class, 'updatePassword'])->middleware('auth:sanctum');
 // Định nghĩa các API resource routes cho các model
 Route::apiResource('products', ProductController::class);
 Route::apiResource('users', UserController::class);
@@ -54,3 +59,9 @@ Route::get('get-product/{id}', [ProductController::class, 'get_product_informati
 
 Route::post('create-new-product', [ProductController::class, 'create_new_product']);
 Route::post('update-product/{id}', [ProductController::class, 'update_product']);
+
+// Verify email
+Route::post('/users/{id}/verify-email', [UserController::class, 'verifyEmail']);
+
+// Verify password
+Route::post('/users/{id}/verify-password', [UserController::class, 'verifyPassword']);
