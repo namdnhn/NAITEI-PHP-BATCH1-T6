@@ -12,10 +12,12 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
+use App\Mail\OrderConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 
 // Lấy thông tin user hiện tại sau khi đã xác thực
 Route::get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 })->middleware('auth:sanctum');
 
 // Route để cập nhật email
@@ -53,7 +55,7 @@ Route::post('create-new-product', [ProductController::class, 'create_new_product
 Route::get('users/{email}/{password}', [UserController::class, 'findUserByEmailAndPassword']);
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
-    Route::get('show-list-product', [ProductController::class, 'list']);
+  Route::get('show-list-product', [ProductController::class, 'list']);
 });
 Route::get('get-product/{id}', [ProductController::class, 'get_product_information']);
 
@@ -65,3 +67,4 @@ Route::post('/users/{id}/verify-email', [UserController::class, 'verifyEmail']);
 
 // Verify password
 Route::post('/users/{id}/verify-password', [UserController::class, 'verifyPassword']);
+Route::post('/send-order-confirmation', [OrderController::class, 'sendOrderConfirmation']);
