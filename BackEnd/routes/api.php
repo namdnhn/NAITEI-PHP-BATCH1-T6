@@ -14,6 +14,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Mail\OrderConfirmationMail;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\StatisticsController;
 
 // Lấy thông tin user hiện tại sau khi đã xác thực
 Route::get('/user', function (Request $request) {
@@ -70,3 +71,6 @@ Route::post('/users/{id}/verify-password', [UserController::class, 'verifyPasswo
 Route::post('/send-order-confirmation', [OrderController::class, 'sendOrderConfirmation']);
 
 Route::post('/google-login', [UserController::class, 'googleLogin']);
+
+//Lấy dữ liệu thống kê
+Route::get('/statistics', [StatisticsController::class, 'getStatistics']);
