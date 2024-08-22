@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Axios from '../../constants/Axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx'; // Import useAuth
+import { GoogleButton } from 'react-google-button';
+import { auth } from '../../firebase'; // Import Firebase auth
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'; // Import Google provider
 
 function SignIn() {
   const [email, setEmail] = useState('');
@@ -20,6 +23,28 @@ function SignIn() {
       alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+
+        const googleUser = {
+            email: result.user.email,
+            displayName: result.user.displayName,
+        };
+
+        console.log('Google user:', googleUser); // Kiểm tra dữ liệu
+
+        const response = await Axios.post('/google-login', googleUser);
+        login(response.data); // Cập nhật người dùng trong AuthContext
+        navigate('/');
+    } catch (error) {
+        console.error('Google Login Error:', error);
+        alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+    }
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white p-6">
@@ -55,6 +80,10 @@ function SignIn() {
         >
           Log In
         </button>
+
+        <div className='max-w-[240px] m-auto py-4'>
+          <GoogleButton onClick={handleGoogleLogin} />
+        </div>
       </form>
     </div>
   );

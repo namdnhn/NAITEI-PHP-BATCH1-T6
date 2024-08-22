@@ -68,3 +68,5 @@ Route::post('/users/{id}/verify-email', [UserController::class, 'verifyEmail']);
 // Verify password
 Route::post('/users/{id}/verify-password', [UserController::class, 'verifyPassword']);
 Route::post('/send-order-confirmation', [OrderController::class, 'sendOrderConfirmation']);
+
+Route::post('/google-login', [UserController::class, 'googleLogin']);

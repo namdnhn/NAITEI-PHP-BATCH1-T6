@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str; // Thêm dòng này
 
 class UserController extends Controller
 {
@@ -91,4 +92,33 @@ class UserController extends Controller
         }
     }
 
+    public function googleLogin(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'displayName' => 'required|string',
+    ]);
+
+    try {
+        // Tìm user trong cơ sở dữ liệu
+        $user = User::where('email', $request->email)->first();
+
+        // Nếu user không tồn tại, tạo mới
+        if (!$user) {
+            $user = User::create([
+                'name' => $request->displayName,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(16)), // Tạo mật khẩu ngẫu nhiên
+                'role' => 0, // Role mặc định, có thể thay đổi theo nhu cầu
+            ]);
+        }
+
+        // Đăng nhập người dùng
+        Auth::login($user);
+
+        return response()->json($user);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Có lỗi xảy ra'], 500);
+    }
+}
 }
