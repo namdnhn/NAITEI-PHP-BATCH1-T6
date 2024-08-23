@@ -18,7 +18,7 @@ import SideBar from "./components/sharepages/SideBar.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import Profile from "./components/pages/Profile.jsx";
 import AdminRoute from "./contexts/AdminRoute"; // Import từ cùng thư mục với AuthContext
-
+import StatisticsChart from './components/pages/admin/Chart.jsx';
 function App() {
   return (
     <Router>
@@ -60,7 +60,8 @@ function App() {
                   path="edit-product/:productId"
                   element={<UpdateProduct />}
                 />
-              </Route>
+                <Route path="statistics" element={<StatisticsChart />} />
+          </Route>
             </Routes>
             <Footer />
           </div>
