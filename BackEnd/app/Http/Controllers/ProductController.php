@@ -260,7 +260,6 @@ class ProductController extends Controller
     private function handleVariants($request, $product)
     {
         $existingVariantIds = $product->variants->pluck('id')->toArray();
-        logger($existingVariantIds);
         $newVariantIds = [];
 
         foreach ($request->input('variants') as $variantIndex => $variantData) {
