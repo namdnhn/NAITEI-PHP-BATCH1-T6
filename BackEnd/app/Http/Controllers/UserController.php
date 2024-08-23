@@ -121,4 +121,20 @@ class UserController extends Controller
         return response()->json(['message' => 'Có lỗi xảy ra'], 500);
     }
 }
+
+public function authenticate(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if ($user && Hash::check($request->password, $user->password)) {
+        return response()->json($user);
+    } else {
+        return response()->json(['message' => 'Invalid email or password'], 404);
+    }
+}
 }

@@ -14,11 +14,14 @@ import ProductDetail from "./components/pages/ProductDetail.jsx";
 import CreateNewProduct from "./components/pages/admin/CreateNewProduct.jsx";
 import ShowListProduct from "./components/pages/admin/ShowListProduct.jsx";
 import UpdateProduct from "./components/pages/admin/UpdateProduct.jsx";
+import ManageOrder from "./components/pages/admin/ManageOrder.jsx";
+import OrderItemList from "./components/pages/admin/OrderItemList.jsx";
 import SideBar from "./components/sharepages/SideBar.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import Profile from "./components/pages/Profile.jsx";
-import AdminRoute from "./contexts/AdminRoute"; // Import từ cùng thư mục với AuthContext
 import StatisticsChart from './components/pages/admin/Chart.jsx';
+import AdminRoute from "./contexts/AdminRoute";
+
 function App() {
   return (
     <Router>
@@ -53,6 +56,22 @@ function App() {
                   element={
                     <AdminRoute>
                       <ShowListProduct />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="manage-orders"
+                  element={
+                    <AdminRoute>
+                      <ManageOrder />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="order-items-list/:orderID"
+                  element={
+                    <AdminRoute>
+                      <OrderItemList />
                     </AdminRoute>
                   }
                 />
