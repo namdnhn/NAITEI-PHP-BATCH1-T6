@@ -15,7 +15,7 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await Axios.get(`/users/${email}/${password}`);
+      const response = await Axios.post('/authenticate', { email, password });
       login(response.data); // Update user in AuthContext
       navigate('/');
     } catch (error) {
@@ -44,7 +44,6 @@ function SignIn() {
         alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white p-6">

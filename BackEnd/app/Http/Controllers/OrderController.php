@@ -11,11 +11,14 @@ use App\Mail\OrderConfirmationMail;
 class OrderController extends Controller
 {
     // Get all orders
-    public function index()
-    {
-        $orders = Order::with('items')->get();
-        return response()->json($orders);
-    }
+    // Get all orders
+public function index()
+{
+    // Thêm 'user' để lấy thông tin người dùng kèm theo đơn hàng
+    $orders = Order::with('user', 'items')->get();
+    return response()->json($orders);
+}
+
 
     // Get a single order
     public function show($id)
@@ -50,28 +53,35 @@ class OrderController extends Controller
         if ($order) {
             $validatedData = $request->validate([
                 'user_id' => 'sometimes|required|exists:users,id',
-                'status' => 'sometimes|required|string',
+                'status' => 'sometimes|required|string|in:Pending,Processing,Shipped,Completed,Cancelled', // Danh sách các trạng thái
                 'total_price' => 'sometimes|required|numeric',
             ]);
-
+    
             $order->update($validatedData);
             return response()->json($order);
         } else {
             return response()->json(['message' => 'Order not found'], 404);
         }
     }
+    
 
     // Delete an order
     public function destroy($id)
     {
-        $order = Order::find($id);
-        if ($order) {
-            $order->delete();
-            return response()->json(['message' => 'Order deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Order not found'], 404);
+    $order = Order::with('items')->find($id);
+    if ($order) {
+        // Xóa tất cả các order items liên quan
+        foreach ($order->items as $item) {
+            $item->delete();
         }
+        
+        $order->delete();
+        return response()->json(['message' => 'Order and its items deleted successfully']);
+    } else {
+        return response()->json(['message' => 'Order not found'], 404);
     }
+    }
+
 
     public function sendOrderConfirmation(Request $request)
     {

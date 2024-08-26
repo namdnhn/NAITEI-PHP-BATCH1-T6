@@ -74,3 +74,6 @@ Route::post('/google-login', [UserController::class, 'googleLogin']);
 
 //Lấy dữ liệu thống kê
 Route::get('/statistics', [StatisticsController::class, 'getStatistics']);
+Route::get('orders/{orderId}/items', [OrderItemController::class, 'getOrderItemsByOrderId']);
+
+Route::post('authenticate', [UserController::class, 'authenticate']);
