@@ -48,6 +48,13 @@ Route::get('products/{productId}/variants', [VariantController::class, 'index'])
 Route::post('add-to-cart', [CartItemController::class, 'add_item_to_cart']);
 Route::get('cart-items', [CartItemController::class, 'get_cart_items']);
 
+// Tăng giảm số lượng sản phẩm trong giỏ hàng
+Route::put('cart-items/increase/{id}', [CartItemController::class, 'increaseQuantity']);
+Route::put('cart-items/decrease/{id}', [CartItemController::class, 'decreaseQuantity']);
+
+// Xóa sản phẩm khỏi giỏ hàng
+Route::delete('cart-items/remove/{id}', [CartItemController::class, 'destroy']);
+
 // Lấy danh sách sản phẩm tùy chỉnh và tạo sản phẩm mới
 Route::get('get-list-products', [ProductController::class, 'list']);
 Route::post('create-new-product', [ProductController::class, 'create_new_product']);
@@ -85,3 +92,6 @@ Route::get('/list-users', [UserController::class, 'listUsers']);
 Route::get('/get-user/{id}', [UserController::class, 'show']);
 Route::put('/update-user/{id}', [UserController::class, 'update']);
 Route::delete('/delete-user/{id}', [UserController::class, 'destroy']);
+
+// Đếm số biến thể (variant)
+Route::get('/products-with-variant-count', [ProductController::class, 'getProductsWithVariantCount']);

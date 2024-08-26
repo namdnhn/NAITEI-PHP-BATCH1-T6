@@ -345,4 +345,11 @@ class ProductController extends Controller
 
         return response()->json($products);
     }
+
+    public function getProductsWithNameAndImage(Request $request)
+    {
+        $products = Product::select('id', 'name', 'image')->get();
+
+        return response()->json($products);
+    }
 }

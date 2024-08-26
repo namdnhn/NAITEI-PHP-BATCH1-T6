@@ -109,10 +109,57 @@ class CartItemController extends Controller
     {
         $userId = 1;
         $cartId = Cart::where('user_id', $userId)->first()->id;
-        $cartItems = CartItem::with(['productVariantSize', 'variant', 'variant.images', 'size'])
-                             ->where('cart_id', $cartId)
-                             ->get();
+        $cartItems = CartItem::with(['productVariantSize', 'variant.images', 'size'])
+        ->where('cart_id', $cartId)
+        ->get();
 
-        return response()->json($cartItems);
+        $cartItemsWithImages = $cartItems->map(function ($item) {
+            $imageUrls = $item->variant->images->map(function ($image) {
+                return $image->url;
+            });
+
+            return [
+                'id' => $item->id,
+                'variant' => $item->variant,
+                'size' => $item->size,
+                'quantity' => $item->quantity,
+                'product_variant_size' => $item->productVariantSize,
+                'images' => $imageUrls,
+                'product' => $item->variant->product,
+            ];
+        });
+
+        return response()->json($cartItemsWithImages);
     }
+
+
+    public function increaseQuantity($id)
+    {
+        $cartItem = CartItem::find($id);
+        if ($cartItem) {
+            $cartItem->quantity += 1;
+            $cartItem->save();
+            return response()->json($cartItem);
+        } else {
+            return response()->json(['message' => 'Cart item not found'], 404);
+        }
+    }
+
+    public function decreaseQuantity($id)
+    {
+        $cartItem = CartItem::find($id);
+        if ($cartItem) {
+            if ($cartItem->quantity > 1) {
+                $cartItem->quantity -= 1;
+                $cartItem->save();
+            } else {
+                $cartItem->delete();
+                return response()->json(['message' => 'Cart item deleted due to quantity being zero']);
+            }
+            return response()->json($cartItem);
+        } else {
+            return response()->json(['message' => 'Cart item not found'], 404);
+        }
+    }
+
 }
