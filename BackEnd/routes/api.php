@@ -77,3 +77,6 @@ Route::get('/statistics', [StatisticsController::class, 'getStatistics']);
 Route::get('orders/{orderId}/items', [OrderItemController::class, 'getOrderItemsByOrderId']);
 
 Route::post('authenticate', [UserController::class, 'authenticate']);
+
+// Đếm số biến thể (variant)
+Route::get('/products-with-variant-count', [ProductController::class, 'getProductsWithVariantCount']);

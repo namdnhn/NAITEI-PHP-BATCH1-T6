@@ -340,4 +340,10 @@ class ProductController extends Controller
         return $response;
     }
 
+    public function getProductsWithVariantCount()
+    {
+        $products = Product::withCount('variants')->get();
+
+        return response()->json($products);
+    }
 }
