@@ -14,3 +14,7 @@ body {
     max-width: var(--lgcontainer);
     text-align: center;
 }
+
+.container2 {
+    max-width: var(--lgcontainer);
+}

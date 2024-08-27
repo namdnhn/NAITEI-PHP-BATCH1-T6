@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::with('children')->whereNull('parent_id')->get();
         return response()->json($categories);
     }
 
@@ -25,35 +25,37 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        $category = Category::create($validatedData);
+        $category = Category::create($request->all());
         return response()->json($category, 201);
     }
 
     public function update(Request $request, $id)
     {
-        $category = Category::find($id);
-        if ($category) {
-            $validatedData = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'description' => 'sometimes|required|string',
-            ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:categories,id',
+        ]);
 
-            $category->update($validatedData);
-            return response()->json($category);
-        } else {
-            return response()->json(['message' => 'Category not found'], 404);
-        }
+        $category = Category::findOrFail($id);
+        $category->update($request->all());
+
+        return response()->json($category);
     }
 
     public function destroy($id)
     {
         $category = Category::find($id);
         if ($category) {
+            $children = $category->children;
+            foreach ($children as $child) {
+                $child->parent_id = null;
+                $child->save();
+            }
             $category->delete();
             return response()->json($category);
         } else {
