@@ -17,9 +17,11 @@ import UpdateProduct from "./components/pages/admin/UpdateProduct.jsx";
 import ManageOrder from "./components/pages/admin/ManageOrder.jsx";
 import OrderItemList from "./components/pages/admin/OrderItemList.jsx";
 import SideBar from "./components/sharepages/SideBar.jsx";
+import ShowListUser from "./components/pages/admin/ShowListUser.jsx";
+import UpdateUser from "./components/pages/admin/UpdateUser.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import Profile from "./components/pages/Profile.jsx";
-import StatisticsChart from './components/pages/admin/Chart.jsx';
+import StatisticsChart from "./components/pages/admin/Chart.jsx";
 import AdminRoute from "./contexts/AdminRoute";
 
 function App() {
@@ -60,6 +62,19 @@ function App() {
                   }
                 />
                 <Route
+                  path="edit-product/:productId"
+                  element={<UpdateProduct />}
+                />
+                <Route
+                  path="show-list-user"
+                  element={
+                    <AdminRoute>
+                      <ShowListUser />
+                    </AdminRoute>
+                  }
+                />
+                <Route path="edit-user/:userId" element={<UpdateUser />} />
+                <Route
                   path="manage-orders"
                   element={
                     <AdminRoute>
@@ -75,12 +90,8 @@ function App() {
                     </AdminRoute>
                   }
                 />
-                <Route
-                  path="edit-product/:productId"
-                  element={<UpdateProduct />}
-                />
                 <Route path="statistics" element={<StatisticsChart />} />
-          </Route>
+              </Route>
             </Routes>
             <Footer />
           </div>

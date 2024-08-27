@@ -72,7 +72,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if ($user) {
-            $user->delete();
+            $user->update(['is_active' => false]);
             return response()->json(['message' => 'User deleted successfully']);
         } else {
             return response()->json(['message' => 'User not found'], 404);
@@ -93,48 +93,54 @@ class UserController extends Controller
     }
 
     public function googleLogin(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'displayName' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'displayName' => 'required|string',
+        ]);
 
-    try {
-        // Tìm user trong cơ sở dữ liệu
+        try {
+            // Tìm user trong cơ sở dữ liệu
+            $user = User::where('email', $request->email)->first();
+
+            // Nếu user không tồn tại, tạo mới
+            if (!$user) {
+                $user = User::create([
+                    'name' => $request->displayName,
+                    'email' => $request->email,
+                    'password' => Hash::make(Str::random(16)), // Tạo mật khẩu ngẫu nhiên
+                    'role' => 0, // Role mặc định, có thể thay đổi theo nhu cầu
+                ]);
+            }
+
+            // Đăng nhập người dùng
+            Auth::login($user);
+
+            return response()->json($user);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Có lỗi xảy ra'], 500);
+        }
+    }
+    public function listUsers(Request $request)
+    {
+        $limit = $request->query('limit', 10);
+        $users = User::where('is_active', true)->paginate($limit);
+        return response()->json($users);
+    }
+
+    public function authenticate(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
         $user = User::where('email', $request->email)->first();
 
-        // Nếu user không tồn tại, tạo mới
-        if (!$user) {
-            $user = User::create([
-                'name' => $request->displayName,
-                'email' => $request->email,
-                'password' => Hash::make(Str::random(16)), // Tạo mật khẩu ngẫu nhiên
-                'role' => 0, // Role mặc định, có thể thay đổi theo nhu cầu
-            ]);
+        if ($user && Hash::check($request->password, $user->password)) {
+            return response()->json($user);
+        } else {
+            return response()->json(['message' => 'Invalid email or password'], 404);
         }
-
-        // Đăng nhập người dùng
-        Auth::login($user);
-
-        return response()->json($user);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Có lỗi xảy ra'], 500);
     }
-}
-
-public function authenticate(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|string',
-    ]);
-
-    $user = User::where('email', $request->email)->first();
-
-    if ($user && Hash::check($request->password, $user->password)) {
-        return response()->json($user);
-    } else {
-        return response()->json(['message' => 'Invalid email or password'], 404);
-    }
-}
 }

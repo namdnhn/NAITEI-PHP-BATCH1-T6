@@ -80,3 +80,8 @@ Route::post('authenticate', [UserController::class, 'authenticate']);
 
 // Đếm số biến thể (variant)
 Route::get('/products-with-variant-count', [ProductController::class, 'getProductsWithVariantCount']);
+// Manage user
+Route::get('/list-users', [UserController::class, 'listUsers']);
+Route::get('/get-user/{id}', [UserController::class, 'show']);
+Route::put('/update-user/{id}', [UserController::class, 'update']);
+Route::delete('/delete-user/{id}', [UserController::class, 'destroy']);
