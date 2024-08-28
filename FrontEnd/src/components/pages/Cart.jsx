@@ -9,7 +9,9 @@ import Loading from "../sharepages/Loading";
 const CartItem = ({ item, onRemove, onIncrease, onDecrease }) => {
   const variant = item.variant;
   const size = item.size;
-  const imageUrl = variant.images.length > 0 ? variant.images[0].url : "";
+
+  const imageUrl = item.images[0];
+
 
   return (
     <div className="flex items-center justify-between border-b py-4">
@@ -18,12 +20,12 @@ const CartItem = ({ item, onRemove, onIncrease, onDecrease }) => {
         className="flex items-center"
       >
         <img
-          src={imageUrl}
+          src={item.product.image}
           alt={variant.name}
           className="w-16 h-16 object-cover"
         />
         <div className="flex-1 ml-4">
-          <h2 className="text-lg font-bold">{variant.name}</h2>
+          <h2 className="text-lg font-bold">{item.product.name}</h2>
           <p>Variant: {variant.name}</p>
           <p>Size: {size.name}</p>
         </div>
@@ -90,18 +92,19 @@ const Cart = () => {
 
   const handleRemove = async (id) => {
     try {
-      await Axios.delete(`/cart-items/${id}`);
+      await Axios.delete(`/cart-items/remove/${id}`);
       setItems(items.filter((item) => item.id !== id));
       toast.success("Item removed from cart");
     } catch (error) {
       console.error("Error removing item from cart:", error);
+      toast.error("Failed to remove item from cart");
     }
   };
 
   const handleIncrease = async (id) => {
     try {
       const item = items.find((item) => item.id === id);
-      await Axios.put(`/cart-items/${id}`, {
+      await Axios.put(`/cart-items/increase/${id}`, {
         quantity: item.quantity + 1,
       });
       setItems(
@@ -111,6 +114,7 @@ const Cart = () => {
       );
     } catch (error) {
       console.error("Error increasing item quantity:", error);
+      toast.error("Failed to increase item quantity");
     }
   };
 
@@ -118,7 +122,7 @@ const Cart = () => {
     try {
       const item = items.find((item) => item.id === id);
       if (item.quantity > 1) {
-        await Axios.put(`/cart-items/${id}`, {
+        await Axios.put(`/cart-items/decrease/${id}`, {
           quantity: item.quantity - 1,
         });
         setItems(
@@ -126,14 +130,19 @@ const Cart = () => {
             item.id === id ? { ...item, quantity: item.quantity - 1 } : item
           )
         );
+      } else {
+        await Axios.delete(`/cart-items/remove/${id}`);
+        setItems(items.filter((item) => item.id !== id));
+        toast.success("Item removed from cart");
       }
     } catch (error) {
       console.error("Error decreasing item quantity:", error);
+      toast.error("Failed to decrease item quantity");
     }
   };
 
   if (loading) {
-    return <Loading/>;
+    return <Loading />;
   }
 
   const total = items.reduce(
