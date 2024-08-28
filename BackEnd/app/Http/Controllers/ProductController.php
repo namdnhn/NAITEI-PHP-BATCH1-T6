@@ -100,7 +100,8 @@ class ProductController extends Controller
     public function list(Request $request)
     {
         $limit = $request->query('limit', 10);
-        $products = Product::with('variants', 'variants.sizes')->paginate($limit);
+        $products = Product::with('variants', 'variants.sizes')
+            ->paginate($limit);
         return response()->json($products);
     }
 

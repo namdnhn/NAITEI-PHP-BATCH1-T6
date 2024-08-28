@@ -14,11 +14,11 @@ class VariantController extends Controller
 {
     public function index(Product $productId)
     {
-        $product = Product::with('variants.sizes', 'variants.images')->find($productId)->first();
+        $product = $productId->load('variants.sizes', 'variants.images');
 
         foreach ($product->variants as $variant) {
             foreach ($variant->images as $image) {
-                $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                $image->url = config('filesystems.disks.public.url') . $image->url;
             }
         }
         return response()->json($product, 201);
