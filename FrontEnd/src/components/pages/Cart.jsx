@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Axios from "../../constants/Axios";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "../sharepages/Loading";
 
-const CartItem = ({ item, onRemove, onIncrease, onDecrease }) => {
+const CartItem = ({ item, onRemove, onIncrease, onDecrease, onSelect, selected }) => {
   const variant = item.variant;
   const size = item.size;
 
-  const imageUrl = item.images[0];
-
-
   return (
     <div className="flex items-center justify-between border-b py-4">
+      <input
+        type="checkbox"
+        checked={selected}
+        onChange={() => onSelect(item.id)}
+        className="mr-4"
+      />
       <Link
         to={`/product/${variant.product_id}`}
         className="flex items-center"
@@ -69,11 +72,15 @@ CartItem.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onIncrease: PropTypes.func.isRequired,
   onDecrease: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  selected: PropTypes.bool.isRequired,
 };
 
 const Cart = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -94,6 +101,7 @@ const Cart = () => {
     try {
       await Axios.delete(`/cart-items/remove/${id}`);
       setItems(items.filter((item) => item.id !== id));
+      setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
       toast.success("Item removed from cart");
     } catch (error) {
       console.error("Error removing item from cart:", error);
@@ -133,6 +141,7 @@ const Cart = () => {
       } else {
         await Axios.delete(`/cart-items/remove/${id}`);
         setItems(items.filter((item) => item.id !== id));
+        setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
         toast.success("Item removed from cart");
       }
     } catch (error) {
@@ -141,12 +150,36 @@ const Cart = () => {
     }
   };
 
+  const handleSelect = (id) => {
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((itemId) => itemId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleCheckout = () => {
+    const selectedCartItems = items.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+    if (selectedCartItems.length === 0) {
+      toast.error("Please select at least one item to checkout.");
+      return;
+    }
+  
+    navigate("/order", { state: { selectedItems: selectedCartItems } });
+  };
+  
+
   if (loading) {
     return <Loading />;
   }
 
   const total = items.reduce(
-    (acc, item) => acc + item.product_variant_size.price * item.quantity,
+    (acc, item) =>
+      selectedItems.includes(item.id)
+        ? acc + item.product_variant_size.price * item.quantity
+        : acc,
     0
   );
 
@@ -161,17 +194,20 @@ const Cart = () => {
             onRemove={handleRemove}
             onIncrease={handleIncrease}
             onDecrease={handleDecrease}
+            onSelect={handleSelect}
+            selected={selectedItems.includes(item.id)}
           />
         ))}
       </div>
       <div className="flex justify-end">
         <div className="w-full lg:w-1/3 border rounded-lg p-4">
           <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
-          <Link to="/order">
-            <button className="w-full bg-black text-white py-2 mt-4 font-bold">
-              CHECKOUT
-            </button>
-          </Link>
+          <button
+            onClick={handleCheckout}
+            className="w-full bg-black text-white py-2 mt-4 font-bold"
+          >
+            CHECKOUT
+          </button>
         </div>
       </div>
       <ToastContainer />

@@ -65,6 +65,7 @@ Route::get('users/{email}/{password}', [UserController::class, 'findUserByEmailA
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
   Route::get('show-list-product', [ProductController::class, 'list']);
 });
+
 Route::get('get-product/{id}', [ProductController::class, 'get_product_information']);
 
 Route::post('create-new-product', [ProductController::class, 'create_new_product']);
@@ -100,3 +101,6 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);
 Route::put('/categories/{id}', [CategoryController::class, 'update']);
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+// api.php
+Route::get('orders', [OrderController::class, 'index']);

@@ -12,10 +12,18 @@ class OrderController extends Controller
 {
     // Get all orders
     // Get all orders
-public function index()
+// OrderController.php
+public function index(Request $request)
 {
-    // Thêm 'user' để lấy thông tin người dùng kèm theo đơn hàng
-    $orders = Order::with('user', 'items')->get();
+    $userId = $request->query('user_id');
+    
+    // Lấy đơn hàng của người dùng hoặc tất cả nếu không có user_id
+    $orders = Order::with('user', 'items')
+                    ->when($userId, function ($query, $userId) {
+                        return $query->where('user_id', $userId);
+                    })
+                    ->get();
+    
     return response()->json($orders);
 }
 
