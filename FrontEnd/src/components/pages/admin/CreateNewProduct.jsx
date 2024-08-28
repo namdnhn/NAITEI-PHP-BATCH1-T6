@@ -44,10 +44,7 @@ const CreateProduct = () => {
 
       if (variant.images && variant.images.length > 0) {
         Array.from(variant.images).forEach((image, index) => {
-          formData.append(
-            `variants[${variantIndex}][images][${index}]`,
-            image
-          );
+          formData.append(`variants[${variantIndex}][images][${index}]`, image);
         });
       }
     });
@@ -66,11 +63,24 @@ const CreateProduct = () => {
   };
 
   const handleAddSize = (variantIndex) => {
-    const updatedVariants = [...variantFields];
-    updatedVariants[variantIndex].sizes = [
-      ...updatedVariants[variantIndex].sizes,
-      {},
-    ];
+    const updatedVariants = variantFields.map((variant, index) => {
+      // Nếu là variant cần cập nhật thì thêm size mới
+      if (index === variantIndex) {
+        return {
+          ...variant, // Giữ nguyên tất cả các thông tin hiện có của variant
+          sizes: [
+            ...variant.sizes,
+            {
+              name: "", // Tên của size mới (có thể để trống hoặc giá trị mặc định)
+              stock_quantity: 0, // Số lượng tồn kho mặc định
+              price: 0, // Giá mặc định
+            },
+          ],
+        };
+      }
+      // Nếu không, trả về variant không thay đổi
+      return variant;
+    });
     setValue("variants", updatedVariants);
   };
 
@@ -87,15 +97,15 @@ const CreateProduct = () => {
     const updatedVariants = [...variantFields];
     const currentImages = updatedVariants[variantIndex].images || [];
     updatedVariants[variantIndex].images = [...currentImages, ...files];
-    setValue("variants", updatedVariants); 
+    setValue("variants", updatedVariants);
   };
 
   const handleRemoveImage = (variantIndex, imageIndex) => {
     const updatedVariants = [...variantFields];
     const newImages = Array.from(updatedVariants[variantIndex].images);
-    newImages.splice(imageIndex, 1); 
+    newImages.splice(imageIndex, 1);
     updatedVariants[variantIndex].images = newImages;
-    setValue("variants", updatedVariants); 
+    setValue("variants", updatedVariants);
   };
 
   useEffect(() => {
@@ -113,25 +123,37 @@ const CreateProduct = () => {
 
   return (
     <div className="mt-6 container mx-auto w-2/3 p-6 max-w-md bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl text-blue-500 font-bold mb-6 text-left">Create New Product</h1>
+      <h1 className="text-3xl text-blue-500 font-bold mb-6 text-left">
+        Create New Product
+      </h1>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-md ${message.includes("Failed") ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}>
+        <div
+          className={`mb-4 p-4 rounded-md ${
+            message.includes("Failed")
+              ? "bg-red-100 text-red-600"
+              : "bg-green-100 text-green-600"
+          }`}
+        >
           {message}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="w-2/3 mx-auto">
           <div>
-            <label className="block text-lg font-medium mb-2">Product Name</label>
+            <label className="block text-lg font-medium mb-2">
+              Product Name
+            </label>
             <input
               {...register("name")}
               className="border border-gray-300 p-2 w-full rounded-md"
             />
           </div>
           <div>
-            <label className="block text-lg font-medium mb-2">Description</label>
+            <label className="block text-lg font-medium mb-2">
+              Description
+            </label>
             <textarea
               {...register("description")}
               className="border border-gray-300 p-2 w-full rounded-md"
@@ -146,7 +168,9 @@ const CreateProduct = () => {
             />
           </div>
           <div>
-            <label className="block text-lg font-medium mb-2">Category ID</label>
+            <label className="block text-lg font-medium mb-2">
+              Category ID
+            </label>
             <select
               {...register("category_id")}
               className="border border-gray-300 p-2 w-full rounded-md"
@@ -162,7 +186,9 @@ const CreateProduct = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold text-blue-500 mb-4 text-left">Variants</h2>
+          <h2 className="text-2xl font-bold text-blue-500 mb-4 text-left">
+            Variants
+          </h2>
           {variantFields.map((variant, variantIndex) => (
             <div
               key={variant.id}
@@ -199,13 +225,17 @@ const CreateProduct = () => {
                         <h5 className="text-md font-semibold">
                           Size {sizeIndex + 1}
                         </h5>
-                        {variant.sizes.length > 1 && <button
-                          type="button"
-                          onClick={() => handleRemoveSize(variantIndex, sizeIndex)}
-                          className="text-red-500"
-                        >
-                          Remove
-                        </button>}
+                        {variant.sizes.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveSize(variantIndex, sizeIndex)
+                            }
+                            className="text-red-500"
+                          >
+                            Remove
+                          </button>
+                        )}
                       </div>
                       <div className="mb-2">
                         <label className="block text-md font-medium mb-2">
@@ -280,7 +310,6 @@ const CreateProduct = () => {
                   ))}
                 </div>
               </div>
-
             </div>
           ))}
           <button

@@ -12,7 +12,7 @@ const Sidebar = () => {
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
-          Quản lý sản phẩm
+          Product management
         </NavLink>
         <NavLink
           to="/admin/create-new-product"
@@ -20,15 +20,15 @@ const Sidebar = () => {
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
-          Tạo sản phẩm mới
+          Create new product
         </NavLink>
         <NavLink
-          to="/admin/show-list-users"
+          to="/admin/show-list-user"
           className={({ isActive }) =>
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
-          Quản lý người dùng
+          User management
         </NavLink>
         <NavLink
           to="/admin/categories"
@@ -36,7 +36,7 @@ const Sidebar = () => {
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
-          Quản lý category
+          Category management
         </NavLink>
         <NavLink
           to="/admin/create-new-category"
@@ -52,7 +52,7 @@ const Sidebar = () => {
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
-          Quản lý đơn hàng
+          Manage orders
         </NavLink>
       </nav>
     </div>
