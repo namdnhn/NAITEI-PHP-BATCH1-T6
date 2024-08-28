@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -21,7 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'phonenumber', 
+        'phonenumber',
         'address',
         'is_active',
     ];
@@ -59,4 +60,17 @@ class User extends Authenticatable
     {
         return $this->role === 1;
     }
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $today = today()->toDateString();
+
+            // Đảm bảo dòng thống kê cho ngày hôm nay tồn tại
+            DB::table('statistics')->updateOrInsert(
+                ['date' => $today],
+                ['total_users' => DB::raw('total_users + 1')]
+            );
+        });
+    }
+
 }

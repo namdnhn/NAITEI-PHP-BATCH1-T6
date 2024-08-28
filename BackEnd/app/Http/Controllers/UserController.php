@@ -32,16 +32,21 @@ class UserController extends Controller
     // Create a new user
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|integer',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'role' => 'required|integer',
+            ]);
 
-        $validatedData['password'] = Hash::make($validatedData['password']);
-        $user = User::create($validatedData);
-        return response()->json($user, 201);
+            $validatedData['password'] = Hash::make($validatedData['password']);
+            $user = User::create($validatedData);
+
+            return response()->json($user, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     // Update an existing user

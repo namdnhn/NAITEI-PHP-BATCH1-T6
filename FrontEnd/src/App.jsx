@@ -30,69 +30,103 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Header />
-        <div className="flex-1">
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/login" element={<SignIn />} />
-            <Route path="/logout" element={<SignUp />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/order" element={<Order />} />
-            <Route path="/detail" element={<Detail />} />
-            <Route path="/report" element={<Report />} />
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/register" element={<SignUp />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/profile/*" element={<Profile />} />
-            <Route path="/myorder/:id" element={<MyOrder />} />
-            {/* Bảo vệ các trang quản trị */}
-            <Route
-              path="/admin/*"
-              element={
-                <AdminRoute>
-                  <div className="flex">
-                    <SideBar />
-                    <div className="flex-1">
-                      <Routes>
-                        <Route
-                          path="create-new-product"
-                          element={<CreateNewProduct />}
-                        />
-                        <Route
-                          path="show-list-product"
-                          element={<ShowListProduct />}
-                        />
-                        <Route
-                          path="edit-product/:productId"
-                          element={<UpdateProduct />}
-                        />
-                        <Route
-                          path="show-list-user"
-                          element={<ShowListUser />}
-                        />
-                        <Route
-                          path="edit-user/:userId"
-                          element={<UpdateUser />}
-                        />
-                        <Route
-                          path="manage-orders"
-                          element={<ManageOrder />}
-                        />
-                        <Route
-                          path="order-items-list/:orderID"
-                          element={<OrderItemList />}
-                        />
-                        <Route
-                          path="statistics"
-                          element={<StatisticsChart />}
-                        />
-                      </Routes>
-                    </div>
-                  </div>
-                </AdminRoute>
-              }
-            />
-          </Routes>
+        <div className="flex">
+          <SideBar />
+          <div className="flex-1">
+            <Header />
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/login" element={<SignIn />} />
+              <Route path="/logout" element={<SignUp />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/order" element={<Order />} />
+              <Route path="/detail" element={<Detail />} />
+              <Route path="/report" element={<Report />} />
+              <Route path="/products" element={<ProductList />} />
+              <Route path="/register" element={<SignUp />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/profile/*" element={<Profile />} />
+              <Route path="/myorder/:id" element={<MyOrder />} />
+              
+              {/* Bảo vệ các trang quản trị */}
+              <Route path="/admin">
+                <Route
+                  path="create-new-product"
+                  element={
+                    <AdminRoute>
+                      <CreateNewProduct />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="show-list-product"
+                  element={
+                    <AdminRoute>
+                      <ShowListProduct />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="edit-product/:productId"
+                  element={
+                    <AdminRoute>
+                      <UpdateProduct />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="show-list-user"
+                  element={
+                    <AdminRoute>
+                      <ShowListUser />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="edit-user/:userId"
+                  element={
+                    <AdminRoute>
+                      <UpdateUser />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="manage-orders"
+                  element={
+                    <AdminRoute>
+                      <ManageOrder />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="order-items-list/:orderID"
+                  element={
+                    <AdminRoute>
+                      <OrderItemList />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="statistics"
+                  element={
+                    <AdminRoute>
+                      <StatisticsChart />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="manage-categories"
+                  element={
+                    <AdminRoute>
+                      <CategoryManager />
+                    </AdminRoute>
+                  }
+                />
+              </Route>
+            </Routes>
+            <Footer />
+          </div>
+          
         </div>
         <Footer />
       </AuthProvider>

@@ -10,6 +10,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            CreateAdminSeeder::class,
+            CategorySeeder::class,
+            ProductSeeder::class,
             UpdateProductImagesSeeder::class,
             VariantSeeder::class,
             SizeSeeder::class,
@@ -48,7 +51,7 @@ class VariantSeeder extends Seeder
 
 
                 unset($availableColors[$colorIndex]);
-                $availableColors = array_values($availableColors); 
+                $availableColors = array_values($availableColors);
             }
         }
     }
