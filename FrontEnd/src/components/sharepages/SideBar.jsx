@@ -7,6 +7,14 @@ const Sidebar = () => {
       <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
       <nav className="flex flex-col space-y-2">
         <NavLink
+          to="/admin/dashboard"
+          className={({ isActive }) =>
+            isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
+          }
+        >
+          Dashboard
+        </NavLink>
+        <NavLink
           to="/admin/show-list-product"
           className={({ isActive }) =>
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
@@ -31,20 +39,12 @@ const Sidebar = () => {
           Quản lý người dùng
         </NavLink>
         <NavLink
-          to="/admin/categories"
+          to="/admin/manage-categories"
           className={({ isActive }) =>
             isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
           }
         >
           Quản lý category
-        </NavLink>
-        <NavLink
-          to="/admin/create-new-category"
-          className={({ isActive }) =>
-            isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
-          }
-        >
-          Tạo category mới
         </NavLink>
         <NavLink
           to="/admin/manage-orders"

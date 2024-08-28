@@ -95,3 +95,8 @@ Route::delete('/delete-user/{id}', [UserController::class, 'destroy']);
 
 // Đếm số biến thể (variant)
 Route::get('/products-with-variant-count', [ProductController::class, 'getProductsWithVariantCount']);
+// manage categories
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store']);
+Route::put('/categories/{id}', [CategoryController::class, 'update']);
+Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);

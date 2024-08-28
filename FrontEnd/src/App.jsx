@@ -23,6 +23,7 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import Profile from "./components/pages/Profile.jsx";
 import StatisticsChart from "./components/pages/admin/Chart.jsx";
 import AdminRoute from "./contexts/AdminRoute";
+import CategoryManager from "./components/pages/admin/CategoriesManager.jsx";
 
 function App() {
   return (
@@ -91,6 +92,7 @@ function App() {
                   }
                 />
                 <Route path="statistics" element={<StatisticsChart />} />
+                <Route path="manage-categories" element={<CategoryManager />} />
               </Route>
             </Routes>
             <Footer />
