@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import Axios from '../../constants/Axios';
+import { Link } from 'react-router-dom';
 
 function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -12,22 +15,27 @@ function SignUp() {
       name,
       email,
       password,
-      role:0,
+      role: 0,
     };
 
     try {
       const response = await Axios.post('/users', userData);
 
-      if (response.status === 200) {
-        window.location.href = '/login';
+      if (response.status === 201) {
+        setMessage('Registration successful! Redirecting to login...');
+        setMessageType('success');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
       } else {
-        console.error('Error:', response.data);
+        setMessage(`Error: ${response.data.message}`);
+        setMessageType('error');
       }
     } catch (error) {
-      console.error('Error:', error.response?.data || error.message);
+      setMessage(`Error: ${error.response?.data?.error || error.message}`);
+      setMessageType('error');
     }
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white mt-10 p-6">
@@ -80,8 +88,15 @@ function SignUp() {
         </button>
 
         <p className="text-center text-gray-600 mt-4">
-          Already registered? <a href="#login" className="text-blue-500 hover:underline">Login</a>
+          Already registered? <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
         </p>
+
+        {/* Display success or error message */}
+        {message && (
+          <p className={`text-center mt-4 ${messageType === 'error' ? 'text-red-500' : 'text-green-500'}`}>
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

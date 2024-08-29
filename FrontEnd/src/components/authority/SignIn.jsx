@@ -17,7 +17,7 @@ function SignIn() {
     try {
       const response = await Axios.post('/authenticate', { email, password });
       login(response.data); // Update user in AuthContext
-      navigate('/');
+      navigate('/products');
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
       alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
@@ -38,7 +38,7 @@ function SignIn() {
 
         const response = await Axios.post('/google-login', googleUser);
         login(response.data); // Cập nhật người dùng trong AuthContext
-        navigate('/');
+        navigate('/products');
     } catch (error) {
         console.error('Google Login Error:', error);
         alert('Có lỗi xảy ra. Vui lòng thử lại sau.');

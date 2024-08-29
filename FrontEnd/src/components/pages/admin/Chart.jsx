@@ -23,7 +23,9 @@ ChartJS.register(
 );
 
 const Chart = () => {
-    const [chartData, setChartData] = useState({});
+    const [salesData, setSalesData] = useState({});
+    const [ordersData, setOrdersData] = useState({});
+    const [usersData, setUsersData] = useState({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,7 +38,7 @@ const Chart = () => {
                 });
                 const data = response.data;
 
-                setChartData({
+                setSalesData({
                     labels: data.labels, // Dates
                     datasets: [
                         {
@@ -45,14 +47,26 @@ const Chart = () => {
                             backgroundColor: 'rgba(75,192,192,0.6)',
                             borderColor: 'rgba(75,192,192,1)',
                             borderWidth: 1,
-                        },
+                        }
+                    ],
+                });
+
+                setOrdersData({
+                    labels: data.labels, // Dates
+                    datasets: [
                         {
                             label: 'Orders',
                             data: data.orders, // Orders data
                             backgroundColor: 'rgba(153,102,255,0.6)',
                             borderColor: 'rgba(153,102,255,1)',
                             borderWidth: 1,
-                        },
+                        }
+                    ],
+                });
+
+                setUsersData({
+                    labels: data.labels, // Dates
+                    datasets: [
                         {
                             label: 'Users',
                             data: data.users, // Users data
@@ -72,32 +86,88 @@ const Chart = () => {
 
     return (
         <div className="p-20 bg-white shadow-lg rounded-lg">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Sales, Orders, and Users Chart</h2>
-            <div className="relative">
-                {chartData.labels ? (
-                    <Line
-                        data={chartData}
-                        className="w-full h-full"
-                        options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                },
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        color: 'rgb(75, 85, 99)', 
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Overview Statistics</h2>
+            <div className="space-y-8">
+                <div className="relative h-60">
+                    <h3 className="text-2xl font-semibold text-gray-700 mb-2">Sales</h3>
+                    {salesData.labels ? (
+                        <Line
+                            data={salesData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
                                     },
                                 },
-                            },
-                        }}
-                    />
-                ) : (
-                    <p className="text-gray-500">Loading...</p>
-                )}
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            color: 'rgb(75, 85, 99)', 
+                                        },
+                                    },
+                                },
+                            }}
+                        />
+                    ) : (
+                        <p className="text-gray-500">Loading...</p>
+                    )}
+                </div>
+
+                <div className="relative h-60">
+                    <h3 className="text-2xl font-semibold text-gray-700 mb-2">Orders</h3>
+                    {ordersData.labels ? (
+                        <Line
+                            data={ordersData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            color: 'rgb(75, 85, 99)', 
+                                        },
+                                    },
+                                },
+                            }}
+                        />
+                    ) : (
+                        <p className="text-gray-500">Loading...</p>
+                    )}
+                </div>
+
+                <div className="relative h-60">
+                    <h3 className="text-2xl font-semibold text-gray-700 mb-2">Users</h3>
+                    {usersData.labels ? (
+                        <Line
+                            data={usersData}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            color: 'rgb(75, 85, 99)', 
+                                        },
+                                    },
+                                },
+                            }}
+                        />
+                    ) : (
+                        <p className="text-gray-500">Loading...</p>
+                    )}
+                </div>
             </div>
         </div>
     );
