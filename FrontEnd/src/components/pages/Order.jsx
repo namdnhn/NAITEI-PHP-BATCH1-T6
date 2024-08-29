@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "../sharepages/Loading";
 import { useAuth } from "../../contexts/AuthContext.jsx";
+import { useLocation, useNavigate } from "react-router-dom"; // Thêm useNavigate
 
 const OrderItem = ({ item }) => {
   const variant = item.variant;
@@ -37,25 +38,18 @@ const OrderItem = ({ item }) => {
 };
 
 const Order = () => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate(); // Khai báo useNavigate
+  const selectedItems = location.state?.selectedItems || [];
 
   useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const response = await Axios.get("/cart-items");
-        setItems(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchCartItems();
-  }, []);
+    if (selectedItems.length === 0) {
+      toast.error("No items selected for checkout.");
+    }
+  }, [selectedItems]);
 
   const handlePlaceOrder = async () => {
     if (!user) {
@@ -66,18 +60,19 @@ const Order = () => {
     const orderData = {
       user_id: user.id,
       status: "pending",
-      total_price: items.reduce(
+      total_price: selectedItems.reduce(
         (acc, item) => acc + item.product_variant_size.price * item.quantity,
         0
       ),
     };
 
     try {
+      setLoading(true);
       const response = await Axios.post("/orders", orderData);
       const newOrderId = response.data.id;
       setOrderId(newOrderId);
-      
-      const orderItemsData = items.map((item) => ({
+
+      const orderItemsData = selectedItems.map((item) => ({
         order_id: newOrderId,
         product_variant_size_id: item.product_variant_size.id,
         quantity: item.quantity,
@@ -85,25 +80,32 @@ const Order = () => {
       }));
 
       for (const orderItem of orderItemsData) {
-        await Axios.post("/order-items", orderItem);
+        try {
+          await Axios.post("/order-items", orderItem);
+        } catch (error) {
+          console.error("Error placing order item:", error);
+          toast.error("Error placing order item");
+        }
       }
 
-      // Gửi email xác nhận đơn hàng
       await Axios.post('/send-order-confirmation', { order_id: newOrderId, email: user.email });
 
       toast.success("Order placed successfully!");
-
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("Error placing order");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  const handleViewOrders = () => {
+    if (user) {
+      navigate(`/myorder/${user.id}`); // Điều hướng đến trang MyOrders
+    }
+  };
 
-  const total = items.reduce(
+  const total = selectedItems.reduce(
     (acc, item) => acc + item.product_variant_size.price * item.quantity,
     0
   );
@@ -112,7 +114,7 @@ const Order = () => {
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Review Your Order</h1>
       <div className="border rounded-lg p-6 bg-white shadow-md mb-6">
-        {items.map((item) => (
+        {selectedItems.map((item) => (
           <OrderItem key={item.id} item={item} />
         ))}
       </div>
@@ -126,6 +128,12 @@ const Order = () => {
             className="w-full bg-black text-white py-3 mt-6 font-bold hover:bg-gray-800 transition-colors duration-200"
           >
             PLACE ORDER
+          </button>
+          <button
+            onClick={handleViewOrders}
+            className="w-full bg-blue-500 text-white py-3 mt-6 font-bold hover:bg-blue-400 transition-colors duration-200"
+          >
+            VIEW MY ORDERS
           </button>
         </div>
       </div>
