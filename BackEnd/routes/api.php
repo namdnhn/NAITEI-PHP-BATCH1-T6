@@ -69,6 +69,7 @@ Route::get('get-product/{id}', [ProductController::class, 'get_product_informati
 
 Route::post('create-new-product', [ProductController::class, 'create_new_product']);
 Route::post('update-product/{id}', [ProductController::class, 'update_product']);
+Route::delete('delete-product/{id}', [ProductController::class, 'destroy']);
 
 // Verify email
 Route::post('/users/{id}/verify-email', [UserController::class, 'verifyEmail']);
@@ -96,6 +97,7 @@ Route::delete('/delete-user/{id}', [UserController::class, 'destroy']);
 // Đếm số biến thể (variant)
 Route::get('/products-with-variant-count', [ProductController::class, 'getProductsWithVariantCount']);
 // manage categories
+Route::get('/all-categories', [CategoryController::class, 'getAllCategories']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);
 Route::put('/categories/{id}', [CategoryController::class, 'update']);
