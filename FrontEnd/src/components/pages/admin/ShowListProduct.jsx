@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Axios from "../../../constants/Axios";
+import { useNavigate } from 'react-router-dom';
 
 function ShowListProduct() {
+  const [message, setMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts(currentPage);
@@ -32,9 +35,35 @@ function ShowListProduct() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await Axios.delete(`/delete-product/${id}`);
+      setMessage('Product deleted successfully');
+      fetchProducts(currentPage);
+    } catch (error) {
+      setMessage('Error deleting product');
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/admin/edit-product/${id}`);
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Product List</h2>
+      {message && (
+        <div
+          className={`mb-4 p-4 rounded-md ${
+            message.includes("Failed")
+              ? "bg-red-100 text-red-600"
+              : "bg-green-100 text-green-600"
+          }`}
+        >
+          {message}
+        </div>
+      )}
       <table className="min-w-full bg-white border border-gray-200 rounded-lg">
         <thead>
           <tr>
@@ -86,14 +115,6 @@ function ShowListProduct() {
       </div>
     </div>
   );
-
-  function handleEdit(id) {
-    // Code xử lý khi bấm nút Edit
-  }
-
-  function handleDelete(id) {
-    // Code xử lý khi bấm nút Delete
-  }
 }
 
 export default ShowListProduct;

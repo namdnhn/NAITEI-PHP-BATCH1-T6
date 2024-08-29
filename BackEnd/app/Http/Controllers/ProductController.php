@@ -88,7 +88,12 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::find($id);
+        $variants = Variant::where('product_id', $id)->get();
         if ($product) {
+            foreach ($variants as $variant) {
+                $variant->sizes()->delete();
+                $variant->images()->delete();
+            }
             $product->delete();
             return response()->json(['message' => 'Product deleted successfully']);
         } else {
@@ -100,7 +105,8 @@ class ProductController extends Controller
     public function list(Request $request)
     {
         $limit = $request->query('limit', 10);
-        $products = Product::with('variants', 'variants.sizes')
+        $products = Product::has('variants')
+            ->with('variants', 'variants.sizes')
             ->paginate($limit);
         return response()->json($products);
     }
@@ -116,7 +122,7 @@ class ProductController extends Controller
             // Tạo đường dẫn đầy đủ cho URL hình ảnh
             foreach ($product->variants as $variant) {
                 foreach ($variant->images as $image) {
-                    $image->url = config('filesystems.disks.public.url') . '/' . $image->url;
+                    $image->url = config('filesystems.disks.public.url') . $image->url;
                 }
             }
 

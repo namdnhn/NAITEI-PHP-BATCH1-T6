@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import React, { useState, useEffect } from "react";
 
 const CreateProduct = () => {
-  const { register, handleSubmit, setValue, control } = useForm();
+  const { register, handleSubmit, setValue, control, getValues } = useForm();
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -56,6 +56,17 @@ const CreateProduct = () => {
         },
       });
       setMessage("Product created successfully!");
+      // Reset form data and variants
+      setValue("name", "");
+      setValue("description", "");
+      setValue("price", "");
+      setValue("category_id", "");
+      setValue("variants", []);
+
+      // Reset variant fields
+      variantFields.forEach((_, index) => {
+        removeVariant(index);
+      });
     } catch (error) {
       setMessage("Failed to create product.");
       console.error("Failed to create product:", error);
@@ -63,24 +74,8 @@ const CreateProduct = () => {
   };
 
   const handleAddSize = (variantIndex) => {
-    const updatedVariants = variantFields.map((variant, index) => {
-      // Nếu là variant cần cập nhật thì thêm size mới
-      if (index === variantIndex) {
-        return {
-          ...variant, // Giữ nguyên tất cả các thông tin hiện có của variant
-          sizes: [
-            ...variant.sizes,
-            {
-              name: "", // Tên của size mới (có thể để trống hoặc giá trị mặc định)
-              stock_quantity: 0, // Số lượng tồn kho mặc định
-              price: 0, // Giá mặc định
-            },
-          ],
-        };
-      }
-      // Nếu không, trả về variant không thay đổi
-      return variant;
-    });
+    const updatedVariants = [...getValues().variants];
+    updatedVariants[variantIndex].sizes.push({});
     setValue("variants", updatedVariants);
   };
 
@@ -111,7 +106,7 @@ const CreateProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await Axios.get("/categories");
+        const response = await Axios.get("/all-categories");
         setCategories(response.data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
