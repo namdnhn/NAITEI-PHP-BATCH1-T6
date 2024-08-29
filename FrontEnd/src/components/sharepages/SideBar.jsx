@@ -4,13 +4,14 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Sidebar = () => {
   const { isAdmin } = useAuth();
+  const { logout } = useAuth();
 
   if (!isAdmin()) {
     return null;
   }
 
   return (
-    <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
+    <div className="w-64 bg-gray-800 text-white flex flex-col p-4 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
       <nav className="flex flex-col space-y-2">
         <NavLink
@@ -28,14 +29,6 @@ const Sidebar = () => {
           }
         >
           Product management
-        </NavLink>
-        <NavLink
-          to="/admin/create-new-product"
-          className={({ isActive }) =>
-            isActive ? 'bg-gray-900 p-2 rounded' : 'p-2 rounded hover:bg-gray-700'
-          }
-        >
-          Create new product
         </NavLink>
         <NavLink
           to="/admin/show-list-user"
@@ -69,6 +62,7 @@ const Sidebar = () => {
         >
           Statistics
         </NavLink>
+        <button onClick={logout} className="bg-red-500 p-2 rounded hover:bg-red-600">Logout</button>
       </nav>
     </div>
   );

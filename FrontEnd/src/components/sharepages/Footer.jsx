@@ -1,6 +1,13 @@
 import React from 'react';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 function Footer () {
+  const { isAdmin } = useAuth();
+  
+  if (isAdmin()) {
+    return null;
+  }
+
   return (
     <footer className="bg-white text-black py-8">
       <div className="container mx-auto px-4">

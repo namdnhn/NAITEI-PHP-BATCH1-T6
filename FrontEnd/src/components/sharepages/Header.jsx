@@ -6,14 +6,17 @@ import PopupHeader from './PopupHeader';
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
 
   const handleSearch = (event) => {
     event.preventDefault();
     navigate(`/products?search=${searchQuery}`);
   };
 
-
+  if (isAdmin()) {
+    return null;
+  }
+  
   return (
     <header id="main-header">
       <div className="headerbar bg-white shadow">

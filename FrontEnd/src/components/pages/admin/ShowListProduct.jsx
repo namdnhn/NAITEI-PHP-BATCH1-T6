@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Axios from "../../../constants/Axios";
-import { useNavigate } from 'react-router-dom';
+import EditModal from './EditProductModal';
+import CreateProductModal from './CreateProductModal';
 
 function ShowListProduct() {
   const [message, setMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [createModal, setCreateModal] = useState(false);
 
   useEffect(() => {
     fetchProducts(currentPage);
@@ -46,13 +48,28 @@ function ShowListProduct() {
     }
   };
 
-  const handleEdit = (id) => {
-    navigate(`/admin/edit-product/${id}`);
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+  };
+
+  const closeModal = () => {
+    setSelectedProduct(null);
+    fetchProducts(currentPage);
+  };
+
+  const handleCreateNewProduct = () => {
+    setCreateModal(true);
   }
+
+  const closeCreateModal = () => {
+    setCreateModal(false);
+    fetchProducts(currentPage);
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Product List</h2>
+      <button onClick={handleCreateNewProduct} className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition-colors mb-4">Create new product</button>
       {message && (
         <div
           className={`mb-4 p-4 rounded-md ${
@@ -113,6 +130,12 @@ function ShowListProduct() {
           Next
         </button>
       </div>
+      {selectedProduct && (
+        <EditModal productId={selectedProduct} onClose={closeModal} />
+      )}
+      {createModal && (
+        <CreateProductModal onClose={closeCreateModal} />
+      )}
     </div>
   );
 }
