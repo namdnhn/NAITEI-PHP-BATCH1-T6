@@ -20,6 +20,6 @@ class OrderItem extends Model
 
     public function productVariantSize()
     {
-        return $this->belongsTo(ProductVariantSize::class, 'product_variant_size_id');
+        return $this->belongsTo(ProductVariantSize::class, 'product_variant_size_id')->with('product', 'variant', 'size');
     }
 }

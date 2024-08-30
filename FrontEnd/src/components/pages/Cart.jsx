@@ -23,7 +23,7 @@ const CartItem = ({ item, onRemove, onIncrease, onDecrease, onSelect, selected }
         className="flex items-center"
       >
         <img
-          src={item.product.image}
+          src={item.images[0]}
           alt={variant.name}
           className="w-16 h-16 object-cover"
         />
